@@ -27,7 +27,7 @@ class AutenticacionApi {
           return primero['token'] as String;
         }
       }
-      throw const ExcepcionApi('Respuesta inesperada del servidor al iniciar sesion.');
+      throw const ExcepcionApi('Respuesta inesperada del servidor al iniciar sesión.');
     } on DioException catch (error) {
       throw ExcepcionApi.desdeDio(error);
     }

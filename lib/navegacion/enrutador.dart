@@ -8,6 +8,9 @@ import 'package:traducontextmovil/funcionalidades/administracion/reportes/presen
 import 'package:traducontextmovil/funcionalidades/administracion/usuarios/presentacion/pantallas/pantalla_usuarios.dart';
 import 'package:traducontextmovil/funcionalidades/autenticacion/presentacion/proveedores/estado_sesion.dart';
 import 'package:traducontextmovil/funcionalidades/autenticacion/presentacion/pantallas/pantalla_inicio_sesion.dart';
+import 'package:traducontextmovil/funcionalidades/autenticacion/presentacion/pantallas/pantalla_recuperar_contrasena.dart';
+import 'package:traducontextmovil/funcionalidades/autenticacion/presentacion/pantallas/pantalla_registro.dart';
+import 'package:traducontextmovil/funcionalidades/autenticacion/presentacion/pantallas/pantalla_verificar_correo.dart';
 import 'package:traducontextmovil/navegacion/carcasas/carcasa_administracion.dart';
 import 'package:traducontextmovil/navegacion/carcasas/carcasa_usuario.dart';
 import 'package:traducontextmovil/funcionalidades/inicio/presentacion/pantallas/pantalla_inicio.dart';
@@ -22,10 +25,10 @@ String? redirigirSegunSesion(EstadoSesion sesion, String ubicacion) {
     case SesionCargando():
       return ubicacion == Rutas.cargando ? null : Rutas.cargando;
     case SesionNoAutenticada():
-      return ubicacion == Rutas.login ? null : Rutas.login;
+      return Rutas.publicas.contains(ubicacion) ? null : Rutas.login;
     case SesionAutenticada(:final usuario):
       final rutaInicial = Rutas.inicialPara(usuario);
-      if (ubicacion == Rutas.login || ubicacion == Rutas.cargando) {
+      if (ubicacion == Rutas.cargando || Rutas.publicas.contains(ubicacion)) {
         return rutaInicial;
       }
       final permisoRequerido = Rutas.permisoPorRuta[ubicacion];
@@ -54,6 +57,19 @@ final enrutadorProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: Rutas.login,
         builder: (context, estado) => const PantallaInicioSesion(),
+      ),
+      GoRoute(
+        path: Rutas.registro,
+        builder: (context, estado) => const PantallaRegistro(),
+      ),
+      GoRoute(
+        path: Rutas.verificarCorreo,
+        builder: (context, estado) =>
+            PantallaVerificarCorreo(correo: estado.extra is String ? estado.extra! as String : null),
+      ),
+      GoRoute(
+        path: Rutas.recuperarContrasena,
+        builder: (context, estado) => const PantallaRecuperarContrasena(),
       ),
       StatefulShellRoute.indexedStack(
         builder: (context, estado, navegacion) => CarcasaUsuario(navegacion: navegacion),

@@ -10,7 +10,7 @@ class PantallaUsuarios extends StatelessWidget {
     return const PantallaEnConstruccion(
       titulo: 'Usuarios',
       icono: Icons.people_outline,
-      descripcion: 'Gestion de usuarios (M4).',
+      descripcion: 'Gestión de usuarios (M4).',
     );
   }
 }

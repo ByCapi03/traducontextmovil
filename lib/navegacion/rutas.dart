@@ -1,10 +1,17 @@
-import 'package:traducontextmovil/funcionalidades/autenticacion/datos/modelos/usuario_actual.dart';
+import 'package:traducontextmovil/funcionalidades/autenticacion/dominio/usuario_actual.dart';
 import 'package:traducontextmovil/nucleo/permisos/permisos.dart';
 
 /// Rutas de la app. Las de administracion coinciden con las del front web.
 abstract final class Rutas {
   static const String cargando = '/cargando';
   static const String login = '/login';
+
+  // Publicas (sin sesion). verificarCorreo recibe el correo en `extra`.
+  static const String registro = '/registro';
+  static const String verificarCorreo = '/verificar-correo';
+  static const String recuperarContrasena = '/recuperar-contrasena';
+
+  static const Set<String> publicas = {login, registro, verificarCorreo, recuperarContrasena};
 
   // Carcasa de usuario
   static const String inicio = '/inicio';

@@ -10,8 +10,8 @@ class BotonCerrarSesion extends ConsumerWidget {
     final confirmado = await showDialog<bool>(
       context: context,
       builder: (contexto) => AlertDialog(
-        title: const Text('Cerrar sesion'),
-        content: const Text('Quieres cerrar tu sesion?'),
+        title: const Text('Cerrar sesión'),
+        content: const Text('¿Quieres cerrar tu sesión?'),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(contexto).pop(false),
@@ -19,7 +19,7 @@ class BotonCerrarSesion extends ConsumerWidget {
           ),
           TextButton(
             onPressed: () => Navigator.of(contexto).pop(true),
-            child: const Text('Cerrar sesion'),
+            child: const Text('Cerrar sesión'),
           ),
         ],
       ),
@@ -32,7 +32,7 @@ class BotonCerrarSesion extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return IconButton(
-      tooltip: 'Cerrar sesion',
+      tooltip: 'Cerrar sesión',
       icon: const Icon(Icons.logout),
       onPressed: () => _confirmar(context, ref),
     );

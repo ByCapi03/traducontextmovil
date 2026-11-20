@@ -1,17 +1,14 @@
 import 'package:traducontextmovil/nucleo/permisos/permisos.dart';
 
-/// Espejo de `RolDetalle` (app/schemas/usuario.py).
+/// Rol del usuario autenticado.
 class Rol {
   const Rol({required this.id, required this.nombre});
 
   final int id;
   final String nombre;
-
-  factory Rol.desdeJson(Map<String, dynamic> json) =>
-      Rol(id: json['id'] as int, nombre: json['nombre'] as String);
 }
 
-/// Espejo de `UsuarioPerfilDetalle`, devuelto por GET /usuarios/me.
+/// Usuario autenticado (entidad de dominio, sin dependencias de red).
 class UsuarioActual {
   const UsuarioActual({
     required this.id,
@@ -28,18 +25,6 @@ class UsuarioActual {
   final String estado;
   final Rol rol;
   final List<String> permisos;
-
-  factory UsuarioActual.desdeJson(Map<String, dynamic> json) => UsuarioActual(
-        id: json['id'] as int,
-        nombre: json['nombre'] as String,
-        correo: json['correo'] as String,
-        estado: json['estado'] as String,
-        rol: Rol.desdeJson(json['rol'] as Map<String, dynamic>),
-        permisos: [
-          for (final permiso in (json['permisos'] as List<dynamic>? ?? const []))
-            permiso as String,
-        ],
-      );
 
   bool tienePermiso(String permiso) => permisos.contains(permiso);
 

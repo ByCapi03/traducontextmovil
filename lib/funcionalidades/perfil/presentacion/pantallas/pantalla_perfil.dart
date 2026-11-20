@@ -45,7 +45,7 @@ class PantallaPerfil extends ConsumerWidget {
         ),
         const SizedBox(height: Espaciados.md),
         Text(
-          'La edicion del perfil llegara en M2.',
+          'La edición del perfil llegará en M2.',
           textAlign: TextAlign.center,
           style: textos.bodySmall,
         ),

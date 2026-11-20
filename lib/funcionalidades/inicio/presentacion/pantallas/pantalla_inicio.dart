@@ -13,7 +13,7 @@ class PantallaInicio extends ConsumerWidget {
     return PantallaEnConstruccion(
       titulo: 'Hola, ${usuario?.nombre ?? ''}',
       icono: Icons.home_outlined,
-      descripcion: 'Aqui veras tu resumen y notificaciones (M2).',
+      descripcion: 'Aquí verás tu resumen y notificaciones (M2).',
     );
   }
 }

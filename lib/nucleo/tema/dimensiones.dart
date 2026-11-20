@@ -15,6 +15,11 @@ abstract final class Espaciados {
   static const double xl = 32;
 }
 
+/// Anchos máximos de contenido para que los formularios no se estiren en tablet.
+abstract final class Anchos {
+  static const double formulario = 420;
+}
+
 abstract final class Sombras {
   /// --sombra-suave: 0 2px 8px rgba(0, 0, 0, 0.08)
   static const List<BoxShadow> suave = [

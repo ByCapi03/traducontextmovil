@@ -1,10 +1,11 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:traducontextmovil/funcionalidades/autenticacion/datos/modelos/usuario_actual.dart';
+import 'package:traducontextmovil/funcionalidades/autenticacion/datos/modelos/usuario_actual_modelo.dart';
+import 'package:traducontextmovil/funcionalidades/autenticacion/dominio/usuario_actual.dart';
 import 'package:traducontextmovil/navegacion/enrutador.dart';
 import 'package:traducontextmovil/navegacion/rutas.dart';
 import 'package:traducontextmovil/funcionalidades/autenticacion/presentacion/proveedores/estado_sesion.dart';
 
-UsuarioActual _usuario(List<String> permisos) => UsuarioActual.desdeJson({
+UsuarioActual _usuario(List<String> permisos) => UsuarioActualModelo.desdeJson({
       'id': 1,
       'nombre': 'Prueba',
       'correo': 'prueba@correo.com',
@@ -25,6 +26,22 @@ void main() {
     test('sin sesion siempre va a /login', () {
       expect(redirigirSegunSesion(const SesionNoAutenticada(), Rutas.inicio), Rutas.login);
       expect(redirigirSegunSesion(const SesionNoAutenticada(), Rutas.login), isNull);
+    });
+
+    test('sin sesion deja entrar a las rutas publicas', () {
+      for (final ruta in [Rutas.registro, Rutas.verificarCorreo, Rutas.recuperarContrasena]) {
+        expect(redirigirSegunSesion(const SesionNoAutenticada(), ruta), isNull);
+      }
+      expect(redirigirSegunSesion(const SesionNoAutenticada(), Rutas.perfil), Rutas.login);
+    });
+
+    test('con sesion las rutas publicas redirigen a la ruta inicial', () {
+      final usuario = SesionAutenticada(_usuario([]));
+      final admin = SesionAutenticada(_usuario(['gestionar_usuarios']));
+      for (final ruta in [Rutas.registro, Rutas.verificarCorreo, Rutas.recuperarContrasena]) {
+        expect(redirigirSegunSesion(usuario, ruta), Rutas.inicio);
+        expect(redirigirSegunSesion(admin, ruta), Rutas.administracionUsuarios);
+      }
     });
 
     test('usuario normal entra a /inicio y no puede abrir administracion', () {

@@ -9,7 +9,7 @@ class PantallaEnConstruccion extends StatelessWidget {
     super.key,
     required this.titulo,
     required this.icono,
-    this.descripcion = 'Disponible proximamente.',
+    this.descripcion = 'Disponible próximamente.',
   });
 
   final String titulo;

@@ -2,8 +2,9 @@ import 'dart:async';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import 'package:traducontextmovil/funcionalidades/autenticacion/datos/modelos/usuario_actual.dart';
-import 'package:traducontextmovil/funcionalidades/autenticacion/datos/repositorios/autenticacion_repositorio.dart';
+import 'package:traducontextmovil/funcionalidades/autenticacion/datos/repositorios/autenticacion_repositorio_remoto.dart';
+import 'package:traducontextmovil/funcionalidades/autenticacion/dominio/autenticacion_repositorio.dart';
+import 'package:traducontextmovil/funcionalidades/autenticacion/dominio/usuario_actual.dart';
 import 'package:traducontextmovil/nucleo/red/excepcion_api.dart';
 import 'package:traducontextmovil/nucleo/red/notificador_sesion_expirada.dart';
 
@@ -30,7 +31,7 @@ class SesionAutenticada extends EstadoSesion {
 }
 
 class ControladorSesion extends Notifier<EstadoSesion> {
-  static const String _mensajeExpirada = 'Tu sesion expiro. Inicia sesion nuevamente.';
+  static const String _mensajeExpirada = 'Tu sesión expiró. Inicia sesión nuevamente.';
 
   AutenticacionRepositorio get _repositorio => ref.read(autenticacionRepositorioProvider);
 
@@ -54,7 +55,9 @@ class ControladorSesion extends Notifier<EstadoSesion> {
       // Si fue un 401 el interceptor ya disparo expirarSesion().
       if (state is SesionCargando) {
         state = SesionNoAutenticada(
-          mensaje: error.esNoAutorizado ? _mensajeExpirada : error.mensaje,
+          mensaje: error.esNoAutorizado
+              ? _mensajeExpirada
+              : (error.sinConexion ? error.mensaje : 'No se pudo restaurar la sesión. Inicia sesión nuevamente.'),
         );
       }
     }
