@@ -1,3 +1,5 @@
+import 'package:traducontextmovil/funcionalidades/notificaciones/dominio/agrupador_notificaciones.dart';
+
 /// Mensajería push del dispositivo (FCM + notificaciones locales).
 ///
 /// Separada del servicio que decide qué hacer con los mensajes para poder
@@ -24,8 +26,12 @@ abstract interface class MensajeriaPush {
   /// Notificación que abrió la app cuando estaba cerrada.
   Future<Map<String, String>?> mensajeInicial();
 
-  /// Muestra una notificación local (en primer plano FCM no la muestra).
-  Future<void> mostrar(MensajePush mensaje);
+  /// Muestra (o actualiza, mismo id) una notificación local: en primer plano
+  /// FCM no la muestra.
+  Future<void> mostrar(NotificacionLocal notificacion);
+
+  /// Quita la notificación local con ese id (p. ej. al abrir su chat).
+  Future<void> cancelar(int id);
 }
 
 class MensajePush {

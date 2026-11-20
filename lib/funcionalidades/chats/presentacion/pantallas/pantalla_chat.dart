@@ -9,6 +9,7 @@ import 'package:traducontextmovil/funcionalidades/catalogos/dominio/idioma.dart'
 import 'package:traducontextmovil/funcionalidades/chats/datos/chats_repositorio_remoto.dart';
 import 'package:traducontextmovil/funcionalidades/chats/dominio/chats.dart';
 import 'package:traducontextmovil/funcionalidades/chats/presentacion/widgets/burbuja_mensaje.dart';
+import 'package:traducontextmovil/funcionalidades/notificaciones/presentacion/proveedores/servicio_push.dart';
 import 'package:traducontextmovil/nucleo/red/excepcion_api.dart';
 import 'package:traducontextmovil/nucleo/tema/colores.dart';
 import 'package:traducontextmovil/nucleo/tema/dimensiones.dart';
@@ -42,17 +43,23 @@ class _PantallaChatState extends ConsumerState<PantallaChat> {
   bool _enviando = false;
   String? _error;
 
+  /// Se lee en initState: en dispose() ya no se puede usar ref.
+  late final ServicioPush _push = ref.read(servicioPushProvider);
+
   ChatsRepositorio get _repositorio => ref.read(chatsRepositorioProvider);
 
   @override
   void initState() {
     super.initState();
     _ciclo = AppLifecycleListener(onResume: _iniciarRefresco, onPause: _detenerRefresco);
+    // Con este chat en pantalla no se muestran sus notificaciones locales.
+    _push.alAbrirChat(widget.idChat);
     unawaited(_cargar());
   }
 
   @override
   void dispose() {
+    _push.alCerrarChat(widget.idChat);
     _detenerRefresco();
     _ciclo.dispose();
     _texto.dispose();

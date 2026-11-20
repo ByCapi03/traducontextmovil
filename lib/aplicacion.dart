@@ -35,6 +35,9 @@ class _AplicacionState extends ConsumerState<Aplicacion> {
         unawaited(enrutador.push(ruta));
       }
     });
+    // Sin esto, si nada más pide un frame (p. ej. un toque sin
+    // id_notificacion), la navegación esperaría a la próxima interacción.
+    WidgetsBinding.instance.scheduleFrame();
   }
 
   @override

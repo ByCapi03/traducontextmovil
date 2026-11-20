@@ -7,6 +7,7 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:traducontextmovil/funcionalidades/notificaciones/dominio/agrupador_notificaciones.dart';
 import 'package:traducontextmovil/funcionalidades/notificaciones/dominio/push.dart';
 
 /// Mensajes de datos recibidos con la app en segundo plano o cerrada. Los push
@@ -19,12 +20,15 @@ Future<void> manejarPushEnSegundoPlano(RemoteMessage mensaje) async {
 
 /// Implementación real con Firebase Cloud Messaging y notificaciones locales.
 class MensajeriaFirebase implements MensajeriaPush {
-  static const String _idCanal = 'traducontext_general';
+  static const String _idCanal = ClavesPush.canalMensajes;
+  static const String _nombreCanal = 'Mensajes y avisos';
+
+  /// Lo que el usuario ve como "yo" en el estilo mensajería.
+  static const Person _yo = Person(name: 'Tú', key: 'yo');
 
   final FlutterLocalNotificationsPlugin _locales = FlutterLocalNotificationsPlugin();
   final StreamController<Map<String, String>> _toquesLocales =
       StreamController<Map<String, String>>.broadcast();
-  int _siguienteId = 0;
 
   @override
   Future<bool> iniciar() async {
@@ -47,16 +51,21 @@ class MensajeriaFirebase implements MensajeriaPush {
         _toquesLocales.add(Map<String, String>.from(jsonDecode(carga) as Map));
       },
     );
-    await _locales
-        .resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>()
-        ?.createNotificationChannel(
-          const AndroidNotificationChannel(
-            _idCanal,
-            'Avisos de TraduContext',
-            description: 'Documentos traducidos y mensajes de chat.',
-            importance: Importance.high,
-          ),
-        );
+    final android =
+        _locales.resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>();
+    // La importancia de un canal no se puede cambiar una vez creado: canal
+    // nuevo con importancia alta, sonido predeterminado y vibración.
+    await android?.createNotificationChannel(
+      const AndroidNotificationChannel(
+        _idCanal,
+        _nombreCanal,
+        description: 'Mensajes de chat y documentos traducidos.',
+        importance: Importance.high,
+        playSound: true,
+        enableVibration: true,
+      ),
+    );
+    await android?.deleteNotificationChannel(channelId: ClavesPush.canalAnterior);
     return true;
   }
 
@@ -94,20 +103,35 @@ class MensajeriaFirebase implements MensajeriaPush {
   }
 
   @override
-  Future<void> mostrar(MensajePush mensaje) => _locales.show(
-        id: _siguienteId++,
-        title: mensaje.titulo,
-        body: mensaje.cuerpo,
-        payload: jsonEncode(mensaje.datos),
-        notificationDetails: const NotificationDetails(
+  Future<void> mostrar(NotificacionLocal notificacion) => _locales.show(
+        id: notificacion.id,
+        title: notificacion.titulo,
+        body: notificacion.cuerpo,
+        payload: jsonEncode(notificacion.datos),
+        notificationDetails: NotificationDetails(
           android: AndroidNotificationDetails(
             _idCanal,
-            'Avisos de TraduContext',
+            _nombreCanal,
             importance: Importance.high,
             priority: Priority.high,
+            category: notificacion.lineas.isEmpty ? null : AndroidNotificationCategory.message,
+            groupKey: notificacion.grupo,
+            styleInformation: notificacion.lineas.isEmpty
+                ? null
+                : MessagingStyleInformation(
+                    _yo,
+                    groupConversation: false,
+                    messages: [
+                      for (final linea in notificacion.lineas)
+                        Message(linea.texto, linea.fecha, Person(name: linea.remitente)),
+                    ],
+                  ),
           ),
         ),
       );
+
+  @override
+  Future<void> cancelar(int id) => _locales.cancel(id: id);
 
   MensajePush _convertir(RemoteMessage mensaje) => MensajePush(
         titulo: mensaje.notification?.title,

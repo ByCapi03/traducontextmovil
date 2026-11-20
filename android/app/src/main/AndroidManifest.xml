@@ -35,7 +35,7 @@
         <!-- Canal por defecto de los push de FCM (lo crea la app al iniciar). -->
         <meta-data
             android:name="com.google.firebase.messaging.default_notification_channel_id"
-            android:value="traducontext_general" />
+            android:value="traducontext_mensajes" />
         <meta-data
             android:name="flutterEmbedding"
             android:value="2" />

@@ -5,6 +5,7 @@ import 'package:traducontextmovil/funcionalidades/autenticacion/presentacion/pro
 import 'package:traducontextmovil/funcionalidades/notificaciones/datos/notificaciones_repositorio_remoto.dart';
 import 'package:traducontextmovil/funcionalidades/notificaciones/datos/push/dispositivos_repositorio_remoto.dart';
 import 'package:traducontextmovil/funcionalidades/notificaciones/datos/push/mensajeria_firebase.dart';
+import 'package:traducontextmovil/funcionalidades/notificaciones/dominio/agrupador_notificaciones.dart';
 import 'package:traducontextmovil/funcionalidades/notificaciones/dominio/destino_notificacion.dart';
 import 'package:traducontextmovil/funcionalidades/notificaciones/dominio/push.dart';
 import 'package:traducontextmovil/funcionalidades/notificaciones/presentacion/proveedores/bandeja_notificaciones.dart';
@@ -18,7 +19,9 @@ typedef Navegador = void Function(String ruta);
 /// - al iniciar sesión pide permiso, obtiene el token y lo registra con
 ///   plataforma "android"; también cuando FCM lo renueva;
 /// - antes de cerrar sesión elimina el token del backend;
-/// - en primer plano muestra una notificación local y recarga la bandeja;
+/// - en primer plano muestra una notificación local (agrupada por chat, estilo
+///   mensajería) salvo si el chat que llega es el que está en pantalla, y
+///   recarga la bandeja;
 /// - al tocar una notificación (primer o segundo plano, o app cerrada) abre
 ///   su pantalla; si aún no hay sesión, espera a que la haya.
 ///
@@ -29,6 +32,7 @@ class ServicioPush {
   final Ref _ref;
   final MensajeriaPush? _mensajeria;
   final List<StreamSubscription<Object?>> _suscripciones = [];
+  final AgrupadorNotificaciones _agrupador = AgrupadorNotificaciones();
   Navegador? _navegador;
   bool _disponible = false;
   String? _token;
@@ -97,10 +101,18 @@ class ServicioPush {
     }
   }
 
+  /// La pantalla de un chat avisa al abrirse: no se notifica ese chat y se
+  /// quita su notificación.
+  void alAbrirChat(int idChat) {
+    _agrupador.abrirChat(idChat);
+    if (_disponible) unawaited(_mensajeria?.cancelar(AgrupadorNotificaciones.idNotificacionChat(idChat)));
+  }
+
+  void alCerrarChat(int idChat) => _agrupador.cerrarChat(idChat);
+
   Future<void> _alRecibirEnPrimerPlano(MensajePush mensaje) async {
-    if (mensaje.titulo != null || mensaje.cuerpo != null) {
-      await _mensajeria?.mostrar(mensaje);
-    }
+    final notificacion = _agrupador.preparar(mensaje);
+    if (notificacion != null) await _mensajeria?.mostrar(notificacion);
     if (_ref.read(sesionProvider) is SesionAutenticada) {
       await _ref.read(bandejaNotificacionesProvider.notifier).recargar();
     }
