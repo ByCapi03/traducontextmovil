@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:traducontextmovil/compartido/nombres_idioma.dart';
 import 'package:traducontextmovil/funcionalidades/autenticacion/presentacion/proveedores/estado_sesion.dart';
 import 'package:traducontextmovil/funcionalidades/catalogos/dominio/idioma.dart';
 import 'package:traducontextmovil/funcionalidades/preferencias/dominio/preferencias.dart';
@@ -19,10 +20,10 @@ class CatalogosApi {
       for (final json in listaDeMapas(resultado))
         Idioma(
           id: json['id_idioma'] as int,
-          nombre: json['nombre'] as String,
+          nombre: nombreIdioma(json['codigo'] as String, respaldo: json['nombre'] as String),
           codigo: json['codigo'] as String,
         ),
-    ]..sort((a, b) => a.nombre.compareTo(b.nombre));
+    ]..sort((a, b) => claveOrdenIdioma(a.nombre).compareTo(claveOrdenIdioma(b.nombre)));
     return idiomas;
   }
 

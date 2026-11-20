@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:traducontextmovil/compartido/nombres_idioma.dart';
 import 'package:traducontextmovil/funcionalidades/chats/dominio/chats.dart';
 import 'package:traducontextmovil/nucleo/red/cliente_http.dart';
 import 'package:traducontextmovil/nucleo/red/peticiones_api.dart';
@@ -77,7 +78,7 @@ class ChatsRepositorioRemoto implements ChatsRepositorio {
       id: json['id_chat'] as int,
       otroUsuario: UsuarioChat(id: otro['id_usuario'] as int, nombre: otro['nombre'] as String),
       codigoIdiomaLectura: idioma['codigo'] as String,
-      nombreIdiomaLectura: idioma['nombre'] as String,
+      nombreIdiomaLectura: nombreIdioma(idioma['codigo'] as String, respaldo: idioma['nombre'] as String?),
       ultimoMensaje: ultimo == null ? null : _mensaje(ultimo),
       noLeidos: json['no_leidos'] as int? ?? 0,
       fechaCreacion: fechaDe(json['fecha_creacion']) ?? DateTime.now(),

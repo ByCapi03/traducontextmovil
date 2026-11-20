@@ -1,3 +1,4 @@
+import 'package:traducontextmovil/compartido/nombres_idioma.dart';
 /// Idioma disponible para traducir (GET /idiomas).
 class Idioma {
   const Idioma({required this.id, required this.nombre, required this.codigo});
@@ -14,13 +15,13 @@ class Idioma {
 }
 
 extension BuscarIdioma on List<Idioma> {
-  /// Nombre del idioma con ese código o, si no está en el catálogo, el código.
+  /// Nombre del idioma con ese código (con tildes, ver nombres_idioma.dart).
   String nombreDe(String? codigo) {
     if (codigo == null || codigo.isEmpty) return '';
     for (final idioma in this) {
       if (idioma.codigo == codigo) return idioma.nombre;
     }
-    return codigo.toUpperCase();
+    return nombreIdioma(codigo);
   }
 
   Idioma? porCodigo(String? codigo) {

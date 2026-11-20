@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:traducontextmovil/compartido/nombres_idioma.dart';
 import 'package:traducontextmovil/funcionalidades/autenticacion/presentacion/proveedores/estado_sesion.dart';
 import 'package:traducontextmovil/funcionalidades/glosarios/dominio/glosarios.dart';
 import 'package:traducontextmovil/nucleo/red/cliente_http.dart';
@@ -72,8 +73,14 @@ class GlosariosRepositorioRemoto implements GlosariosRepositorio {
         idIdiomaDestino: json['id_idioma_destino'] as int,
         codigoIdiomaOrigen: json['codigo_idioma_origen'] as String?,
         codigoIdiomaDestino: json['codigo_idioma_destino'] as String?,
-        nombreIdiomaOrigen: json['nombre_idioma_origen'] as String?,
-        nombreIdiomaDestino: json['nombre_idioma_destino'] as String?,
+        nombreIdiomaOrigen: nombreIdiomaOpcional(
+          json['codigo_idioma_origen'] as String?,
+          respaldo: json['nombre_idioma_origen'] as String?,
+        ),
+        nombreIdiomaDestino: nombreIdiomaOpcional(
+          json['codigo_idioma_destino'] as String?,
+          respaldo: json['nombre_idioma_destino'] as String?,
+        ),
         cantidadTerminos: json['cantidad_terminos'] as int? ?? 0,
         terminos: [for (final termino in listaDeMapas(json['terminos'])) _termino(termino)],
       );

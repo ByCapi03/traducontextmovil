@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:traducontextmovil/compartido/nombres_idioma.dart';
 import 'package:traducontextmovil/compartido/periodo.dart';
 import 'package:traducontextmovil/funcionalidades/administracion/dashboard/dominio/dashboard.dart';
 import 'package:traducontextmovil/nucleo/red/cliente_http.dart';
@@ -31,7 +32,10 @@ class DashboardRepositorioRemoto implements DashboardRepositorio {
       conversaciones: actividad['conversaciones'] as int,
       idiomas: [
         for (final idioma in listaDeMapas(json['idiomas_mas_utilizados']))
-          UsoElemento(nombre: idioma['nombre'] as String, total: idioma['total'] as int),
+          UsoElemento(
+            nombre: nombreIdioma(idioma['codigo'] as String?, respaldo: idioma['nombre'] as String),
+            total: idioma['total'] as int,
+          ),
       ],
       contextos: [
         for (final contexto in listaDeMapas(json['contextos_mas_utilizados']))

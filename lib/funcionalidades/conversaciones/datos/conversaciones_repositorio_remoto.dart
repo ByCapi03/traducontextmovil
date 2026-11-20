@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:traducontextmovil/compartido/nombres_idioma.dart';
 import 'package:traducontextmovil/funcionalidades/conversaciones/dominio/conversaciones.dart';
 import 'package:traducontextmovil/nucleo/red/cliente_http.dart';
 import 'package:traducontextmovil/nucleo/red/peticiones_api.dart';
@@ -92,8 +93,8 @@ class ConversacionesRepositorioRemoto implements ConversacionesRepositorio {
         id: json['id_conversacion'] as int,
         estado: EstadoConversacion.desdeCodigo(json['estado'] as String),
         fechaInicio: fechaDe(json['fecha_inicio']) ?? DateTime.now(),
-        nombreIdiomaOrigen: json['nombre_idioma_origen'] as String?,
-        nombreIdiomaDestino: json['nombre_idioma_destino'] as String?,
+        nombreIdiomaOrigen: _nombreIdioma(json, 'origen'),
+        nombreIdiomaDestino: _nombreIdioma(json, 'destino'),
         nombreEntorno: json['nombre_entorno'] as String?,
         nombreContexto: json['nombre_contexto'] as String?,
         descripcionContexto: json['descripcion_contexto'] as String?,
@@ -104,9 +105,17 @@ class ConversacionesRepositorioRemoto implements ConversacionesRepositorio {
               nombre: participante['nombre'] as String,
               orden: participante['orden'] as int,
               codigoIdioma: participante['codigo_idioma'] as String?,
-              nombreIdioma: participante['nombre_idioma'] as String?,
+              nombreIdioma: nombreIdiomaOpcional(
+                participante['codigo_idioma'] as String?,
+                respaldo: participante['nombre_idioma'] as String?,
+              ),
             ),
         ]..sort((a, b) => a.orden.compareTo(b.orden)),
+      );
+
+  String? _nombreIdioma(Map<String, dynamic> json, String lado) => nombreIdiomaOpcional(
+        json['codigo_idioma_$lado'] as String?,
+        respaldo: json['nombre_idioma_$lado'] as String?,
       );
 
   Intervencion _intervencion(Map<String, dynamic> json) => Intervencion(
@@ -117,8 +126,8 @@ class ConversacionesRepositorioRemoto implements ConversacionesRepositorio {
         ordenParticipante: json['orden_participante'] as int?,
         textoOriginal: json['texto_original'] as String,
         textoTraducido: json['texto_traducido'] as String?,
-        nombreIdiomaOrigen: json['nombre_idioma_origen'] as String?,
-        nombreIdiomaDestino: json['nombre_idioma_destino'] as String?,
+        nombreIdiomaOrigen: _nombreIdioma(json, 'origen'),
+        nombreIdiomaDestino: _nombreIdioma(json, 'destino'),
         codigoIdiomaDestino: json['codigo_idioma_destino'] as String?,
         estado: json['estado'] as String,
         fecha: fechaDe(json['fecha_creacion']) ?? DateTime.now(),
