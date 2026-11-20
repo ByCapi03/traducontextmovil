@@ -118,6 +118,7 @@ class ConversacionesRepositorioRemoto implements ConversacionesRepositorio {
         textoTraducido: json['texto_traducido'] as String?,
         nombreIdiomaOrigen: json['nombre_idioma_origen'] as String?,
         nombreIdiomaDestino: json['nombre_idioma_destino'] as String?,
+        codigoIdiomaDestino: json['codigo_idioma_destino'] as String?,
         estado: json['estado'] as String,
         fecha: fechaDe(json['fecha_creacion']) ?? DateTime.now(),
       );

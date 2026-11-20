@@ -75,6 +75,7 @@ class Intervencion {
     this.textoTraducido,
     this.nombreIdiomaOrigen,
     this.nombreIdiomaDestino,
+    this.codigoIdiomaDestino,
   });
 
   final int id;
@@ -86,11 +87,16 @@ class Intervencion {
   final String? textoTraducido;
   final String? nombreIdiomaOrigen;
   final String? nombreIdiomaDestino;
+
+  /// Idioma en el que se lee la traducción en voz alta (HU-28).
+  final String? codigoIdiomaDestino;
   final String estado;
   final DateTime fecha;
 
   /// Igual que la web: se puede reintentar si no quedó traducida.
   bool get puedeReintentar => estado != EstadoIntervencion.traducida;
+
+  bool get puedeLeerse => estado == EstadoIntervencion.traducida && (textoTraducido?.trim().isNotEmpty ?? false);
 }
 
 class NuevaConversacion {

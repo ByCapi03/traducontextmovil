@@ -2,6 +2,8 @@
     <uses-permission android:name="android.permission.INTERNET"/>
     <!-- Android 13+: permiso para mostrar notificaciones (M3). -->
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
+    <!-- Dictado en el interprete (speech_to_text, HU-25). -->
+    <uses-permission android:name="android.permission.RECORD_AUDIO"/>
     <application
         android:label="TraduContext"
         android:name="${applicationName}"
@@ -44,6 +46,14 @@
 
          In particular, this is used by the Flutter engine in io.flutter.plugin.text.ProcessTextPlugin. -->
     <queries>
+        <!-- Android 11+: servicio de reconocimiento de voz (speech_to_text). -->
+        <intent>
+            <action android:name="android.speech.RecognitionService"/>
+        </intent>
+        <!-- Android 11+: motor de sintesis de voz (flutter_tts, HU-28). -->
+        <intent>
+            <action android:name="android.intent.action.TTS_SERVICE"/>
+        </intent>
         <intent>
             <action android:name="android.intent.action.PROCESS_TEXT"/>
             <data android:mimeType="text/plain"/>

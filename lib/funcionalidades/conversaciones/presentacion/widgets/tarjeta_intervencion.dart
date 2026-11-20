@@ -12,12 +12,18 @@ class TarjetaIntervencion extends StatelessWidget {
     required this.reintentando,
     required this.alCopiar,
     this.alReintentar,
+    this.alLeer,
+    this.leyendo = false,
   });
 
   final Intervencion intervencion;
   final bool reintentando;
   final VoidCallback? alReintentar;
   final ValueChanged<String> alCopiar;
+
+  /// Lee la traducción en voz alta (o la detiene si [leyendo]).
+  final VoidCallback? alLeer;
+  final bool leyendo;
 
   @override
   Widget build(BuildContext context) {
@@ -55,6 +61,13 @@ class TarjetaIntervencion extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Expanded(child: SelectableText(traducido, style: textos.bodyLarge)),
+                        if (alLeer != null)
+                          IconButton(
+                            tooltip: leyendo ? 'Detener lectura' : 'Escuchar traducción',
+                            visualDensity: VisualDensity.compact,
+                            icon: Icon(leyendo ? Icons.stop_circle_outlined : Icons.volume_up_outlined, size: 18),
+                            onPressed: alLeer,
+                          ),
                         IconButton(
                           tooltip: 'Copiar traducción',
                           visualDensity: VisualDensity.compact,

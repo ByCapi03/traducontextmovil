@@ -17,12 +17,17 @@ import 'package:traducontextmovil/funcionalidades/traduccion/dominio/traduccion.
 import 'package:traducontextmovil/funcionalidades/traduccion/dominio/traduccion_repositorio.dart';
 import 'package:traducontextmovil/nucleo/archivos/gestor_archivos.dart';
 import 'package:traducontextmovil/nucleo/archivos/selector_archivos.dart';
+import 'package:traducontextmovil/nucleo/preferencias/preferencias_locales.dart';
 import 'package:traducontextmovil/nucleo/red/excepcion_api.dart';
+import 'package:traducontextmovil/nucleo/voz/reconocimiento_voz.dart';
+import 'package:traducontextmovil/nucleo/voz/sintesis_voz.dart';
 
 import 'falsos_m5.dart';
+import 'falsos_voz.dart';
 import 'repositorio_falso.dart';
 
 export 'falsos_m5.dart';
+export 'falsos_voz.dart';
 
 const usuarioNormal = UsuarioActual(
   id: 7,
@@ -52,6 +57,9 @@ class Falsos {
   final ConversacionesFalsas conversaciones = ConversacionesFalsas();
   final SelectorArchivosFalso selectorArchivos = SelectorArchivosFalso();
   final GestorArchivosFalso archivos = GestorArchivosFalso();
+  final ReconocimientoFalso reconocimiento = ReconocimientoFalso();
+  final SintesisFalsa sintesis = SintesisFalsa();
+  final PreferenciasFalsas preferencias = PreferenciasFalsas();
   MensajeriaPush? mensajeria;
   List<Idioma> idiomas = idiomasPrueba;
 
@@ -81,6 +89,9 @@ class Falsos {
         conversacionesRepositorioProvider.overrideWithValue(conversaciones),
         selectorArchivosProvider.overrideWithValue(selectorArchivos),
         gestorArchivosProvider.overrideWithValue(archivos),
+        reconocimientoVozProvider.overrideWithValue(reconocimiento),
+        sintesisVozProvider.overrideWithValue(sintesis),
+        preferenciasLocalesProvider.overrideWithValue(preferencias),
         // Sin push en las pruebas salvo que se asigne [mensajeria].
         mensajeriaPushProvider.overrideWithValue(mensajeria),
         ...adicionales,

@@ -215,6 +215,8 @@ class ConversacionesFalsas implements ConversacionesRepositorio {
       textoOriginal: texto,
       textoTraducido: fallarTraduccion ? null : 'EN: $texto',
       estado: fallarTraduccion ? EstadoIntervencion.error : EstadoIntervencion.traducida,
+      codigoIdiomaDestino: idParticipante == 22 ? 'es' : 'en',
+      nombreIdiomaDestino: idParticipante == 22 ? 'Español' : 'Inglés',
       fecha: DateTime(2026, 11, 20, 8, 1),
     );
     intervencionesServidor = [...intervencionesServidor, intervencion];
