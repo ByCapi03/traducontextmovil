@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:traducontextmovil/funcionalidades/autenticacion/datos/repositorios/autenticacion_repositorio_remoto.dart';
 import 'package:traducontextmovil/funcionalidades/autenticacion/dominio/usuario_actual.dart';
@@ -13,6 +15,8 @@ import 'package:traducontextmovil/funcionalidades/notificaciones/datos/notificac
 import 'package:traducontextmovil/funcionalidades/notificaciones/datos/push/mensajeria_firebase.dart';
 import 'package:traducontextmovil/funcionalidades/notificaciones/dominio/notificacion.dart';
 import 'package:traducontextmovil/funcionalidades/notificaciones/dominio/push.dart';
+import 'package:traducontextmovil/funcionalidades/perfil/datos/perfil_api.dart';
+import 'package:traducontextmovil/funcionalidades/perfil/dominio/perfil.dart';
 import 'package:traducontextmovil/funcionalidades/preferencias/datos/preferencias_repositorio_remoto.dart';
 import 'package:traducontextmovil/funcionalidades/preferencias/dominio/preferencias.dart';
 import 'package:traducontextmovil/funcionalidades/traduccion/datos/repositorios/traduccion_repositorio_remoto.dart';
@@ -66,6 +70,7 @@ class Falsos {
   final SintesisFalsa sintesis = SintesisFalsa();
   final PreferenciasFalsas preferencias = PreferenciasFalsas();
   final GlosariosFalsos glosarios = GlosariosFalsos();
+  final PerfilFalso perfil = PerfilFalso();
   final PreferenciasTraduccionFalsas preferenciasTraduccion = PreferenciasTraduccionFalsas();
   MensajeriaPush? mensajeria;
   List<Idioma> idiomas = idiomasPrueba;
@@ -102,6 +107,7 @@ class Falsos {
         ),
         preferenciasRepositorioProvider.overrideWithValue(preferenciasTraduccion),
         glosariosRepositorioProvider.overrideWithValue(glosarios),
+        perfilApiProvider.overrideWithValue(perfil),
         documentosRepositorioProvider.overrideWithValue(documentos),
         chatsRepositorioProvider.overrideWithValue(chats),
         conversacionesRepositorioProvider.overrideWithValue(conversaciones),
@@ -255,5 +261,31 @@ class PreferenciasTraduccionFalsas implements PreferenciasRepositorio {
   Future<PreferenciasTraduccion> restablecer() async {
     restablecidas++;
     return servidor = const PreferenciasTraduccion(idContexto: 3, idTono: 1);
+  }
+}
+
+class PerfilFalso implements PerfilRepositorio {
+  Uint8List? foto;
+  final List<String> eventos = [];
+  ExcepcionApi? errorSubir;
+
+  @override
+  Future<void> actualizarNombre(String nombre) async => eventos.add('nombre:$nombre');
+
+  @override
+  Future<Uint8List?> obtenerFoto() async => foto;
+
+  @override
+  Future<void> subirFoto({required String nombre, required List<int> bytes}) async {
+    final error = errorSubir;
+    if (error != null) throw error;
+    eventos.add('subir:$nombre:${bytes.length}');
+    foto = Uint8List.fromList(bytes);
+  }
+
+  @override
+  Future<void> eliminarFoto() async {
+    eventos.add('eliminar');
+    foto = null;
   }
 }

@@ -107,7 +107,13 @@ final enrutadorProvider = Provider<GoRouter>((ref) {
       pestana(Rutas.preferencias, const PantallaPreferencias()),
       pestana(
         Rutas.integraciones,
-        const PantallaPendiente(titulo: 'Integraciones', icono: Icons.link),
+        // Requiere OAuth en el navegador (POST /integraciones/{plataforma}/autorizar).
+        const PantallaPendiente(
+          titulo: 'Integraciones',
+          icono: Icons.link,
+          descripcion: 'Vincular Google Meet o Zoom requiere autorizar la cuenta en el navegador. '
+              'Disponible próximamente en la app; mientras tanto, hazlo desde la web.',
+        ),
       ),
       // /chats/nuevo antes que /chats/:idChat.
       pestana(Rutas.nuevoChat, const PantallaNuevoChat()),

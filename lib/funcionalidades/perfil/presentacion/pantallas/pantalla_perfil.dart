@@ -7,6 +7,7 @@ import 'package:traducontextmovil/compartido/widgets/boton_cerrar_sesion.dart';
 import 'package:traducontextmovil/compartido/widgets/contenido_adaptable.dart';
 import 'package:traducontextmovil/funcionalidades/autenticacion/presentacion/proveedores/estado_sesion.dart';
 import 'package:traducontextmovil/funcionalidades/perfil/datos/perfil_api.dart';
+import 'package:traducontextmovil/funcionalidades/perfil/presentacion/widgets/avatar_perfil.dart';
 import 'package:traducontextmovil/navegacion/rutas.dart';
 import 'package:traducontextmovil/nucleo/red/excepcion_api.dart';
 import 'package:traducontextmovil/nucleo/tema/colores.dart';
@@ -56,15 +57,8 @@ class PantallaPerfil extends ConsumerWidget {
               padding: const EdgeInsets.all(Espaciados.lg),
               child: Column(
                 children: [
-                  CircleAvatar(
-                    radius: 36,
-                    backgroundColor: ColoresApp.primario,
-                    child: Text(
-                      usuario.nombre.isNotEmpty ? usuario.nombre[0].toUpperCase() : '?',
-                      style: textos.headlineMedium?.copyWith(color: ColoresApp.textoClaro),
-                    ),
-                  ),
-                  const SizedBox(height: Espaciados.md),
+                  AvatarPerfil(nombre: usuario.nombre),
+                  const SizedBox(height: Espaciados.sm),
                   Text(usuario.nombre, style: textos.titleLarge, textAlign: TextAlign.center),
                   Text(
                     usuario.correo,
@@ -132,7 +126,7 @@ class PantallaPerfil extends ConsumerWidget {
                   _Opcion(
                     icono: Icons.link,
                     titulo: 'Integraciones',
-                    subtitulo: 'Google Meet y Zoom',
+                    subtitulo: 'Google Meet y Zoom · Próximamente',
                     ruta: Rutas.integraciones,
                   ),
                 ],
