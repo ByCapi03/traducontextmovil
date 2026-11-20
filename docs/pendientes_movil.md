@@ -9,9 +9,9 @@ Cada módulo no portado tiene una pantalla `PantallaPendiente` / `PantallaPendie
 | Traducción | `/traducir` | Hecho (M2) | Configuración, detección, intercambio, copiar, alternativas. |
 | Historial | `/historial` | Hecho (M2) | Búsqueda, solo favoritos, favorito, eliminar, copiar. |
 | Perfil | `/perfil` | Hecho (M2) | Editar nombre. Foto de perfil pendiente. |
-| Documentos | `/documentos` | Pendiente (M5) | |
-| Conversaciones (intérprete) | `/conversaciones` | Pendiente (M5) | |
-| Chats entre usuarios | `/chats/:idChat` | Pendiente (M5) | |
+| Documentos | `/documentos` | Hecho (M5) | Subir .docx/.xlsx/.pdf, traducir (origen automático o elegido), descargar/compartir, eliminar. |
+| Conversaciones (intérprete) | `/conversaciones`, `/interprete/:id` | Hecho (M5), solo texto | Crear (idiomas, entorno, contexto, descripción), elegir quién habla, reintentar, pausar/reanudar/finalizar, copiar. |
+| Chats entre usuarios | `/conversaciones` (pestaña Chats), `/chats/:idChat` | Hecho (M5) | Lista, nuevo chat por nombre, original + traducido, idioma de lectura, leído, refresco periódico con la pantalla abierta. |
 | Glosarios | `/glosarios` | Pendiente | CRUD extenso de glosarios y términos; se usa desde la web. |
 | Preferencias de traducción | `/preferencias` | Pendiente | Contexto, tono, variante, glosario por defecto; se usa desde la web. |
 | Integraciones (Meet/Zoom) y sesiones externas | `/integraciones` | Pendiente | Requiere OAuth en navegador y captura de audio de reuniones. |
@@ -44,3 +44,13 @@ Cada módulo no portado tiene una pantalla `PantallaPendiente` / `PantallaPendie
 | Planes / Suscripciones | `/administracion/planes`, `/administracion/suscripciones` | "Próximamente": no existen en el backend. |
 | Filtros por idioma/contexto en reportes | — | Pendiente: la web los tiene; en móvil solo periodo y servicio. |
 | Gráficos de evolución | — | Se muestran como barras; sin librería de gráficos. |
+
+## Pendiente dentro de M5
+
+| Funcionalidad web | Motivo |
+|-------------------|--------|
+| Voz en el intérprete (dictado y lectura en voz alta) | No hay endpoint de audio; la web lo hace en el navegador. Ver pendientes_backend.md #14. |
+| Asistencia conversacional (`POST /conversaciones/{id}/asistencia`) | No portada en móvil. |
+| Renombrar participantes y editar la configuración de una conversación (`PATCH`) | No portado en móvil. |
+| Tono y glosario al crear la conversación | No portado en móvil (contexto y descripción sí). |
+| Chats en tiempo real | Sin WebSocket en el backend; se usa refresco periódico. |

@@ -3,7 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:traducontextmovil/compartido/widgets/pantalla_carga.dart';
 import 'package:traducontextmovil/compartido/widgets/pantalla_pendiente.dart';
-import 'package:traducontextmovil/compartido/widgets/pantalla_pendiente_contenido.dart';
 import 'package:traducontextmovil/funcionalidades/administracion/dashboard/presentacion/pantallas/pantalla_dashboard.dart';
 import 'package:traducontextmovil/funcionalidades/administracion/reportes/presentacion/pantallas/pantalla_reportes.dart';
 import 'package:traducontextmovil/funcionalidades/administracion/usuarios/presentacion/pantallas/pantalla_detalle_usuario.dart';
@@ -13,6 +12,12 @@ import 'package:traducontextmovil/funcionalidades/autenticacion/presentacion/pan
 import 'package:traducontextmovil/funcionalidades/autenticacion/presentacion/pantallas/pantalla_registro.dart';
 import 'package:traducontextmovil/funcionalidades/autenticacion/presentacion/pantallas/pantalla_verificar_correo.dart';
 import 'package:traducontextmovil/funcionalidades/autenticacion/presentacion/proveedores/estado_sesion.dart';
+import 'package:traducontextmovil/funcionalidades/chats/presentacion/pantallas/pantalla_chat.dart';
+import 'package:traducontextmovil/funcionalidades/chats/presentacion/pantallas/pantalla_nuevo_chat.dart';
+import 'package:traducontextmovil/funcionalidades/conversaciones/presentacion/pantallas/pantalla_conversacion.dart';
+import 'package:traducontextmovil/funcionalidades/conversaciones/presentacion/pantallas/pantalla_conversaciones.dart';
+import 'package:traducontextmovil/funcionalidades/conversaciones/presentacion/pantallas/pantalla_nueva_conversacion.dart';
+import 'package:traducontextmovil/funcionalidades/documentos/presentacion/pantallas/pantalla_documentos.dart';
 import 'package:traducontextmovil/funcionalidades/historial/presentacion/pantallas/pantalla_historial.dart';
 import 'package:traducontextmovil/funcionalidades/inicio/presentacion/pantallas/pantalla_inicio.dart';
 import 'package:traducontextmovil/funcionalidades/perfil/presentacion/pantallas/pantalla_perfil.dart';
@@ -82,23 +87,14 @@ final enrutadorProvider = Provider<GoRouter>((ref) {
           StatefulShellBranch(routes: [pestana(Rutas.historial, const PantallaHistorial())]),
           StatefulShellBranch(
             routes: [
-              pestana(
-                Rutas.conversaciones,
-                const PantallaPendienteContenido(
-                  titulo: 'Conversaciones',
-                  icono: Icons.forum_outlined,
-                ),
-              ),
+              pestana(Rutas.conversaciones, const PantallaConversaciones()),
             ],
           ),
           StatefulShellBranch(routes: [pestana(Rutas.perfil, const PantallaPerfil())]),
         ],
       ),
       // Pantallas completas del usuario (modulos de la web aun no portados).
-      pestana(
-        Rutas.documentos,
-        const PantallaPendiente(titulo: 'Documentos', icono: Icons.description_outlined),
-      ),
+      pestana(Rutas.documentos, const PantallaDocumentos()),
       pestana(
         Rutas.glosarios,
         const PantallaPendiente(titulo: 'Glosarios', icono: Icons.menu_book_outlined),
@@ -111,9 +107,19 @@ final enrutadorProvider = Provider<GoRouter>((ref) {
         Rutas.integraciones,
         const PantallaPendiente(titulo: 'Integraciones', icono: Icons.link),
       ),
-      pestana(
-        Rutas.chatPatron,
-        const PantallaPendiente(titulo: 'Chat', icono: Icons.chat_bubble_outline),
+      // /chats/nuevo antes que /chats/:idChat.
+      pestana(Rutas.nuevoChat, const PantallaNuevoChat()),
+      GoRoute(
+        path: Rutas.chatPatron,
+        builder: (context, estado) =>
+            PantallaChat(idChat: int.parse(estado.pathParameters['idChat']!)),
+      ),
+      pestana(Rutas.nuevaConversacion, const PantallaNuevaConversacion()),
+      GoRoute(
+        path: Rutas.conversacionPatron,
+        builder: (context, estado) => PantallaConversacion(
+          idConversacion: int.parse(estado.pathParameters['idConversacion']!),
+        ),
       ),
       // Pantallas completas de administracion. Van antes de la carcasa para
       // que /administracion/usuarios/:id no se resuelva dentro de la pestaña.

@@ -3,16 +3,26 @@ import 'package:traducontextmovil/funcionalidades/autenticacion/datos/repositori
 import 'package:traducontextmovil/funcionalidades/autenticacion/dominio/usuario_actual.dart';
 import 'package:traducontextmovil/funcionalidades/catalogos/datos/catalogos_api.dart';
 import 'package:traducontextmovil/funcionalidades/catalogos/dominio/idioma.dart';
+import 'package:traducontextmovil/funcionalidades/chats/datos/chats_repositorio_remoto.dart';
+import 'package:traducontextmovil/funcionalidades/conversaciones/datos/conversaciones_repositorio_remoto.dart';
+import 'package:traducontextmovil/funcionalidades/documentos/datos/documentos_repositorio_remoto.dart';
 import 'package:traducontextmovil/funcionalidades/historial/datos/historial_repositorio_remoto.dart';
 import 'package:traducontextmovil/funcionalidades/historial/dominio/historial.dart';
 import 'package:traducontextmovil/funcionalidades/notificaciones/datos/notificaciones_repositorio_remoto.dart';
+import 'package:traducontextmovil/funcionalidades/notificaciones/datos/push/mensajeria_firebase.dart';
 import 'package:traducontextmovil/funcionalidades/notificaciones/dominio/notificacion.dart';
+import 'package:traducontextmovil/funcionalidades/notificaciones/dominio/push.dart';
 import 'package:traducontextmovil/funcionalidades/traduccion/datos/repositorios/traduccion_repositorio_remoto.dart';
 import 'package:traducontextmovil/funcionalidades/traduccion/dominio/traduccion.dart';
 import 'package:traducontextmovil/funcionalidades/traduccion/dominio/traduccion_repositorio.dart';
+import 'package:traducontextmovil/nucleo/archivos/gestor_archivos.dart';
+import 'package:traducontextmovil/nucleo/archivos/selector_archivos.dart';
 import 'package:traducontextmovil/nucleo/red/excepcion_api.dart';
 
+import 'falsos_m5.dart';
 import 'repositorio_falso.dart';
+
+export 'falsos_m5.dart';
 
 const usuarioNormal = UsuarioActual(
   id: 7,
@@ -37,6 +47,12 @@ class Falsos {
   final TraduccionFalsa traduccion = TraduccionFalsa();
   final HistorialFalso historial = HistorialFalso();
   final NotificacionesFalsas notificaciones = NotificacionesFalsas();
+  final DocumentosFalsos documentos = DocumentosFalsos();
+  final ChatsFalsos chats = ChatsFalsos();
+  final ConversacionesFalsas conversaciones = ConversacionesFalsas();
+  final SelectorArchivosFalso selectorArchivos = SelectorArchivosFalso();
+  final GestorArchivosFalso archivos = GestorArchivosFalso();
+  MensajeriaPush? mensajeria;
   List<Idioma> idiomas = idiomasPrueba;
 
   /// Overrides de cada prueba (repositorios de administración, M5...).
@@ -54,6 +70,19 @@ class Falsos {
         historialRepositorioProvider.overrideWithValue(historial),
         notificacionesRepositorioProvider.overrideWithValue(notificaciones),
         idiomasProvider.overrideWith((ref) async => idiomas),
+        entornosProvider.overrideWith(
+          (ref) async => const [OpcionCatalogo(id: 1, nombre: 'Consulta médica')],
+        ),
+        contextosProvider.overrideWith(
+          (ref) async => const [OpcionCatalogo(id: 2, nombre: 'Médico')],
+        ),
+        documentosRepositorioProvider.overrideWithValue(documentos),
+        chatsRepositorioProvider.overrideWithValue(chats),
+        conversacionesRepositorioProvider.overrideWithValue(conversaciones),
+        selectorArchivosProvider.overrideWithValue(selectorArchivos),
+        gestorArchivosProvider.overrideWithValue(archivos),
+        // Sin push en las pruebas salvo que se asigne [mensajeria].
+        mensajeriaPushProvider.overrideWithValue(mensajeria),
         ...adicionales,
       ];
 }

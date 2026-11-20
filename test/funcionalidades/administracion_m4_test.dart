@@ -142,20 +142,12 @@ class _ReportesFalsos implements ReportesRepositorio {
   }
 }
 
-class _ArchivosFalsos implements GestorArchivos {
-  final List<String> compartidos = [];
-
-  @override
-  Future<void> guardarYCompartir(ArchivoDescargado archivo) async => compartidos.add(archivo.nombre);
-}
-
 class _Admin {
   _Admin() {
     falsos.adicionales.addAll([
       dashboardRepositorioProvider.overrideWithValue(dashboard),
       usuariosAdminRepositorioProvider.overrideWithValue(usuarios),
       reportesRepositorioProvider.overrideWithValue(reportes),
-      gestorArchivosProvider.overrideWithValue(archivos),
     ]);
   }
 
@@ -163,7 +155,7 @@ class _Admin {
   final dashboard = _DashboardFalso();
   final usuarios = _UsuariosFalsos();
   final reportes = _ReportesFalsos();
-  final archivos = _ArchivosFalsos();
+  GestorArchivosFalso get archivos => falsos.archivos;
 }
 
 void main() {

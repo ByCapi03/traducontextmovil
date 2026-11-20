@@ -28,8 +28,14 @@ abstract final class Rutas {
 
   /// Los chats se listan en la pestaña Conversaciones.
   static const String chats = conversaciones;
+  static const String nuevoChat = '/chats/nuevo';
   static const String chatPatron = '/chats/:idChat';
   static String chat(int idChat) => '/chats/$idChat';
+
+  // Conversación con intérprete
+  static const String nuevaConversacion = '/interprete/nueva';
+  static const String conversacionPatron = '/interprete/:idConversacion';
+  static String conversacion(int idConversacion) => '/interprete/$idConversacion';
 
   // Carcasa de administracion
   static const String prefijoAdministracion = '/administracion';

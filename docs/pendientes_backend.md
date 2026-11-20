@@ -27,3 +27,12 @@ Revisado contra `traducontextback/app/api/routes/{autenticacion,usuarios}.py` y
 |---|----------|------------------|------------------|-----------------|
 | 11 | Planes y suscripciones | No existen modelos ni endpoints. | Perfil del administrador muestra "Planes" y "Suscripciones" como "Próximamente". | `GET/POST /planes`, `PATCH/DELETE /planes/{id}`, `GET /suscripciones?estado=&pagina=`, `PATCH /suscripciones/{id}` (permiso `administrar_planes`, ya sembrado). |
 | 12 | `GET /dashboard`, `GET /reportes/actividad` | Exigen zona horaria IANA. | La app envía `UTC` (Dart no expone la zona IANA sin plugin): los cortes por día pueden desplazarse unas horas. | Opcional: aceptar un desplazamiento (`+-HH:MM`) además de la zona IANA. |
+
+## Detectados en M5 (documentos, intérprete y chats)
+
+| # | Endpoint | Situación actual | Efecto en la app | Cambio sugerido |
+|---|----------|------------------|------------------|-----------------|
+| 13 | WebSocket de chats (Etapa 2) | No existe ningún WebSocket en el backend. | El chat abierto consulta `GET /chats/{id}/mensajes?despues_de=` cada 4 s, solo con la pantalla abierta y la app en primer plano. | `WS /chats/ws?token=...` con eventos `mensaje_nuevo`, `mensaje_traducido` y `leido` por `id_chat`. |
+| 14 | Voz en la conversación con intérprete | No hay endpoint de audio para `/conversaciones` (solo `POST /sesiones-externas/{id}/audio`). La web usa el reconocimiento y la síntesis de voz del navegador. | La app móvil solo admite texto. | `POST /conversaciones/{id}/intervenciones/audio` (multipart, `id_participante`) que transcriba y traduzca. Alternativa sin backend: reconocimiento en el dispositivo (`speech_to_text`), igual que hace la web. |
+| 15 | `POST /documentos/traducir` | Síncrono: la respuesta llega al terminar la traducción. | La app amplía el tiempo de espera a 10 min para esa petición; si la conexión se corta, el resultado se ve al recargar. | Procesar en segundo plano (estado `PENDIENTE`) y avisar con `notificar(DOCUMENTO_LISTO)`. |
+| 16 | `GET /chats/usuarios` | Busca a cualquier usuario activo por nombre. | Se muestra solo id y nombre (el backend no devuelve correo). | Valorar limitar la búsqueda (privacidad). |

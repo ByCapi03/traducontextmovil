@@ -5,7 +5,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:traducontextmovil/aplicacion.dart';
 import 'package:traducontextmovil/funcionalidades/notificaciones/datos/push/dispositivos_repositorio_remoto.dart';
-import 'package:traducontextmovil/funcionalidades/notificaciones/datos/push/mensajeria_firebase.dart';
 import 'package:traducontextmovil/funcionalidades/notificaciones/dominio/destino_notificacion.dart';
 import 'package:traducontextmovil/funcionalidades/notificaciones/dominio/notificacion.dart';
 import 'package:traducontextmovil/funcionalidades/notificaciones/dominio/push.dart';
@@ -76,8 +75,7 @@ Future<void> _montar(
   await tester.pumpWidget(
     ProviderScope(
       overrides: [
-        ...falsos.overrides,
-        mensajeriaPushProvider.overrideWithValue(mensajeria),
+        ...(falsos..mensajeria = mensajeria).overrides,
         dispositivosRepositorioProvider.overrideWithValue(dispositivos),
       ],
       child: const Aplicacion(),

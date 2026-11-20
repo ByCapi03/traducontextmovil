@@ -30,3 +30,12 @@ extension BuscarIdioma on List<Idioma> {
     return null;
   }
 }
+
+/// Elemento genérico de un catálogo (entorno, contexto...).
+class OpcionCatalogo {
+  const OpcionCatalogo({required this.id, required this.nombre, this.descripcion});
+
+  final int id;
+  final String nombre;
+  final String? descripcion;
+}
