@@ -117,9 +117,16 @@ class ChatsFalsos implements ChatsRepositorio {
   @override
   Future<List<Chat>> listar() async => [_chat()];
 
+  final List<String> busquedas = [];
+  ExcepcionApi? errorBusqueda;
+
   @override
-  Future<List<UsuarioChat>> buscarUsuarios(String texto) async =>
-      'luis'.contains(texto.toLowerCase()) ? [luis] : [];
+  Future<List<UsuarioChat>> buscarUsuarios(String texto) async {
+    busquedas.add(texto);
+    final error = errorBusqueda;
+    if (error != null) throw error;
+    return 'luis'.contains(texto.toLowerCase()) ? [luis] : [];
+  }
 
   @override
   Future<Chat> crearOObtener(int idUsuario) async => _chat();

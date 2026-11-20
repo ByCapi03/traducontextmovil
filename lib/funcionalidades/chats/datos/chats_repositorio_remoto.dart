@@ -23,7 +23,11 @@ class ChatsRepositorioRemoto implements ChatsRepositorio {
             _dio.get<dynamic>('/chats/usuarios', queryParameters: {'q': texto.trim(), 'limite': 20}),
           ),
         ))
-          UsuarioChat(id: json['id_usuario'] as int, nombre: json['nombre'] as String),
+          UsuarioChat(
+            id: json['id_usuario'] as int,
+            nombre: json['nombre'] as String,
+            correo: json['correo'] as String?,
+          ),
       ];
 
   @override

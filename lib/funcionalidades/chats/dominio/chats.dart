@@ -1,9 +1,13 @@
 /// Otro participante de un chat (solo id y nombre: sin correo ni foto).
 class UsuarioChat {
-  const UsuarioChat({required this.id, required this.nombre});
+  const UsuarioChat({required this.id, required this.nombre, this.correo});
 
   final int id;
   final String nombre;
+
+  /// Hoy GET /chats/usuarios no lo devuelve (ver docs/pendientes_backend.md);
+  /// se muestra si algún día llega.
+  final String? correo;
 }
 
 /// Estados de lectura de un mensaje según el backend (schemas/chat.py).

@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -8,15 +6,15 @@ import 'package:traducontextmovil/compartido/widgets/contenido_adaptable.dart';
 import 'package:traducontextmovil/compartido/widgets/vista_estado.dart';
 import 'package:traducontextmovil/funcionalidades/chats/datos/chats_repositorio_remoto.dart';
 import 'package:traducontextmovil/funcionalidades/chats/dominio/chats.dart';
+import 'package:traducontextmovil/funcionalidades/chats/presentacion/proveedores/busqueda_usuarios.dart';
 import 'package:traducontextmovil/navegacion/rutas.dart';
 import 'package:traducontextmovil/nucleo/red/excepcion_api.dart';
 import 'package:traducontextmovil/nucleo/tema/dimensiones.dart';
 
-/// Busca a otro usuario por nombre y abre (o crea) el chat con él.
+/// Busca a otro usuario y abre (o crea) el chat con él. El backend busca
+/// solo por nombre (no por correo): ver docs/pendientes_backend.md.
 class PantallaNuevoChat extends ConsumerStatefulWidget {
   const PantallaNuevoChat({super.key});
-
-  static const int longitudMinima = 2;
 
   @override
   ConsumerState<PantallaNuevoChat> createState() => _PantallaNuevoChatState();
@@ -24,38 +22,12 @@ class PantallaNuevoChat extends ConsumerStatefulWidget {
 
 class _PantallaNuevoChatState extends ConsumerState<PantallaNuevoChat> {
   final _busqueda = TextEditingController();
-  Timer? _espera;
-  List<UsuarioChat>? _resultados;
-  bool _buscando = false;
   bool _abriendo = false;
-  String? _error;
 
   @override
   void dispose() {
-    _espera?.cancel();
     _busqueda.dispose();
     super.dispose();
-  }
-
-  void _alEscribir(String texto) {
-    _espera?.cancel();
-    if (texto.trim().length < PantallaNuevoChat.longitudMinima) {
-      setState(() => _resultados = null);
-      return;
-    }
-    _espera = Timer(const Duration(milliseconds: 400), _buscar);
-  }
-
-  Future<void> _buscar() async {
-    setState(() => _buscando = true);
-    try {
-      final resultados = await ref.read(chatsRepositorioProvider).buscarUsuarios(_busqueda.text);
-      if (mounted) setState(() => _resultados = resultados);
-    } on ExcepcionApi catch (error) {
-      if (mounted) setState(() => _error = MensajesError.de(error));
-    } finally {
-      if (mounted) setState(() => _buscando = false);
-    }
   }
 
   Future<void> _abrir(UsuarioChat usuario) async {
@@ -80,7 +52,8 @@ class _PantallaNuevoChatState extends ConsumerState<PantallaNuevoChat> {
 
   @override
   Widget build(BuildContext context) {
-    final resultados = _resultados;
+    final estado = ref.watch(busquedaUsuariosProvider);
+    final busqueda = ref.read(busquedaUsuariosProvider.notifier);
     return Scaffold(
       appBar: AppBar(title: const Text('Nuevo chat')),
       body: ContenidoAdaptable.lista(
@@ -91,40 +64,44 @@ class _PantallaNuevoChatState extends ConsumerState<PantallaNuevoChat> {
               child: TextField(
                 controller: _busqueda,
                 autofocus: true,
-                onChanged: _alEscribir,
+                onChanged: busqueda.escribir,
+                onSubmitted: (_) => busqueda.buscar(),
                 textInputAction: TextInputAction.search,
                 decoration: const InputDecoration(
                   labelText: 'Buscar por nombre',
-                  helperText: 'Escribe al menos 2 letras.',
+                  helperText: 'Escribe al menos ${BusquedaUsuarios.longitudMinima} letras.',
                   prefixIcon: Icon(Icons.search),
                 ),
               ),
             ),
-            if (_buscando || _abriendo) const LinearProgressIndicator(),
+            if (estado is BusquedaEnCurso || _abriendo) const LinearProgressIndicator(),
             Expanded(
-              child: switch (resultados) {
-                null when _error != null => VistaEstado(
-                    icono: Icons.cloud_off_outlined,
-                    esError: true,
-                    mensaje: _error!,
-                  ),
-                null => const VistaEstado(
+              child: switch (estado) {
+                BusquedaInactiva() || BusquedaEnCurso() => const VistaEstado(
                     icono: Icons.person_search_outlined,
                     mensaje: 'Busca a la persona con la que quieres chatear.',
                   ),
-                [] => const VistaEstado(
-                    icono: Icons.person_off_outlined,
-                    mensaje: 'No se encontraron usuarios.',
+                BusquedaFallida(:final mensaje) => VistaEstado(
+                    icono: Icons.cloud_off_outlined,
+                    esError: true,
+                    mensaje: mensaje,
+                    textoAccion: 'Reintentar',
+                    alPresionar: busqueda.buscar,
                   ),
-                _ => ListView(
+                BusquedaResuelta(usuarios: []) => const VistaEstado(
+                    icono: Icons.person_off_outlined,
+                    mensaje: 'No se encontraron usuarios con ese nombre.',
+                  ),
+                BusquedaResuelta(:final usuarios) => ListView(
                     children: [
-                      for (final usuario in resultados)
+                      for (final usuario in usuarios)
                         ListTile(
                           enabled: !_abriendo,
                           leading: CircleAvatar(
                             child: Text(usuario.nombre.isEmpty ? '?' : usuario.nombre[0].toUpperCase()),
                           ),
                           title: Text(usuario.nombre),
+                          subtitle: usuario.correo == null ? null : Text(usuario.correo!),
                           trailing: const Icon(Icons.chat_bubble_outline),
                           onTap: () => _abrir(usuario),
                         ),

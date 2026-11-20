@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
+import 'package:traducontextmovil/compartido/mensajes_error.dart';
 import 'package:traducontextmovil/funcionalidades/chats/dominio/chats.dart';
 import 'package:traducontextmovil/funcionalidades/chats/presentacion/pantallas/pantalla_chat.dart';
 import 'package:traducontextmovil/funcionalidades/conversaciones/dominio/conversaciones.dart';
@@ -9,6 +10,7 @@ import 'package:traducontextmovil/funcionalidades/documentos/dominio/documentos.
 import 'package:traducontextmovil/funcionalidades/inicio/presentacion/pantallas/pantalla_inicio.dart';
 import 'package:traducontextmovil/navegacion/rutas.dart';
 import 'package:traducontextmovil/nucleo/archivos/selector_archivos.dart';
+import 'package:traducontextmovil/nucleo/red/excepcion_api.dart';
 
 import '../apoyo/falsos.dart';
 import '../apoyo/montar_app.dart';
@@ -158,14 +160,45 @@ void main() {
     });
 
     testWidgets('busca un usuario y abre el chat con él', (tester) async {
-      await montarApp(tester, falsos: Falsos().conSesion());
+      final falsos = await montarApp(tester, falsos: Falsos().conSesion());
       await _abrir(tester, Rutas.nuevoChat);
       await tester.enterText(find.byType(TextField), 'lu');
       await tester.pump(const Duration(milliseconds: 500));
+      // Menos de 3 letras: no se busca.
+      expect(falsos.chats.busquedas, isEmpty);
+
+      await tester.enterText(find.byType(TextField), 'l');
+      await tester.enterText(find.byType(TextField), 'lu');
+      await tester.enterText(find.byType(TextField), 'lui');
+      await tester.pump(const Duration(milliseconds: 200));
+      await tester.enterText(find.byType(TextField), 'luis');
+      await tester.pump(const Duration(milliseconds: 500));
       await tester.pumpAndSettle();
+      // Espera entre pulsaciones: una sola petición con el texto final.
+      expect(falsos.chats.busquedas, ['luis']);
       await tocar(tester, find.text('Luis'));
 
       expect(find.byType(PantallaChat), findsOneWidget);
+    });
+
+    testWidgets('búsqueda sin resultados y con error (reintentar)', (tester) async {
+      final falsos = await montarApp(tester, falsos: Falsos().conSesion());
+      await _abrir(tester, Rutas.nuevoChat);
+      await tester.enterText(find.byType(TextField), 'zzz');
+      await tester.pump(const Duration(milliseconds: 500));
+      await tester.pumpAndSettle();
+      expect(find.text('No se encontraron usuarios con ese nombre.'), findsOneWidget);
+
+      falsos.chats.errorBusqueda = const ExcepcionApi('caído', codigoEstado: 500);
+      await tester.enterText(find.byType(TextField), 'luis');
+      await tester.pump(const Duration(milliseconds: 500));
+      await tester.pumpAndSettle();
+      expect(find.text(MensajesError.servidor), findsOneWidget);
+
+      falsos.chats.errorBusqueda = null;
+      await tocar(tester, find.text('Reintentar'));
+      expect(find.text('Luis'), findsOneWidget);
+      expect(falsos.chats.busquedas, ['zzz', 'luis', 'luis']);
     });
 
     testWidgets('la pestaña Conversaciones lista los chats', (tester) async {
