@@ -21,6 +21,7 @@ import 'package:traducontextmovil/funcionalidades/documentos/presentacion/pantal
 import 'package:traducontextmovil/funcionalidades/historial/presentacion/pantallas/pantalla_historial.dart';
 import 'package:traducontextmovil/funcionalidades/inicio/presentacion/pantallas/pantalla_inicio.dart';
 import 'package:traducontextmovil/funcionalidades/perfil/presentacion/pantallas/pantalla_perfil.dart';
+import 'package:traducontextmovil/funcionalidades/preferencias/presentacion/pantallas/pantalla_preferencias.dart';
 import 'package:traducontextmovil/funcionalidades/traduccion/presentacion/pantallas/pantalla_traducir.dart';
 import 'package:traducontextmovil/navegacion/carcasas/carcasa_administracion.dart';
 import 'package:traducontextmovil/navegacion/carcasas/carcasa_usuario.dart';
@@ -99,10 +100,7 @@ final enrutadorProvider = Provider<GoRouter>((ref) {
         Rutas.glosarios,
         const PantallaPendiente(titulo: 'Glosarios', icono: Icons.menu_book_outlined),
       ),
-      pestana(
-        Rutas.preferencias,
-        const PantallaPendiente(titulo: 'Preferencias de traducción', icono: Icons.tune),
-      ),
+      pestana(Rutas.preferencias, const PantallaPreferencias()),
       pestana(
         Rutas.integraciones,
         const PantallaPendiente(titulo: 'Integraciones', icono: Icons.link),

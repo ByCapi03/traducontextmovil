@@ -12,6 +12,8 @@ import 'package:traducontextmovil/funcionalidades/notificaciones/datos/notificac
 import 'package:traducontextmovil/funcionalidades/notificaciones/datos/push/mensajeria_firebase.dart';
 import 'package:traducontextmovil/funcionalidades/notificaciones/dominio/notificacion.dart';
 import 'package:traducontextmovil/funcionalidades/notificaciones/dominio/push.dart';
+import 'package:traducontextmovil/funcionalidades/preferencias/datos/preferencias_repositorio_remoto.dart';
+import 'package:traducontextmovil/funcionalidades/preferencias/dominio/preferencias.dart';
 import 'package:traducontextmovil/funcionalidades/traduccion/datos/repositorios/traduccion_repositorio_remoto.dart';
 import 'package:traducontextmovil/funcionalidades/traduccion/dominio/traduccion.dart';
 import 'package:traducontextmovil/funcionalidades/traduccion/dominio/traduccion_repositorio.dart';
@@ -60,6 +62,7 @@ class Falsos {
   final ReconocimientoFalso reconocimiento = ReconocimientoFalso();
   final SintesisFalsa sintesis = SintesisFalsa();
   final PreferenciasFalsas preferencias = PreferenciasFalsas();
+  final PreferenciasTraduccionFalsas preferenciasTraduccion = PreferenciasTraduccionFalsas();
   MensajeriaPush? mensajeria;
   List<Idioma> idiomas = idiomasPrueba;
 
@@ -82,8 +85,18 @@ class Falsos {
           (ref) async => const [OpcionCatalogo(id: 1, nombre: 'Consulta médica')],
         ),
         contextosProvider.overrideWith(
-          (ref) async => const [OpcionCatalogo(id: 2, nombre: 'Médico')],
+          (ref) async => const [OpcionCatalogo(id: 2, nombre: 'Médico'), OpcionCatalogo(id: 3, nombre: 'General')],
         ),
+        tonosProvider.overrideWith(
+          (ref) async => const [OpcionCatalogo(id: 1, nombre: 'Neutral'), OpcionCatalogo(id: 2, nombre: 'Formal')],
+        ),
+        variantesRegionalesProvider.overrideWith(
+          (ref) async => const [
+            VarianteRegional(id: 5, nombre: 'Español de México', codigo: 'es-MX', idIdioma: 1),
+            VarianteRegional(id: 6, nombre: 'Inglés británico', codigo: 'en-GB', idIdioma: 3),
+          ],
+        ),
+        preferenciasRepositorioProvider.overrideWithValue(preferenciasTraduccion),
         documentosRepositorioProvider.overrideWithValue(documentos),
         chatsRepositorioProvider.overrideWithValue(chats),
         conversacionesRepositorioProvider.overrideWithValue(conversaciones),
@@ -213,4 +226,28 @@ class NotificacionesFalsas implements NotificacionesRepositorio {
 
   @override
   Future<void> marcarTodasLeidas() async => todasMarcadas++;
+}
+
+class PreferenciasTraduccionFalsas implements PreferenciasRepositorio {
+  PreferenciasTraduccion? servidor;
+  final List<PreferenciasTraduccion> guardadas = [];
+  int restablecidas = 0;
+  ExcepcionApi? errorGuardar;
+
+  @override
+  Future<PreferenciasTraduccion?> obtener() async => servidor;
+
+  @override
+  Future<PreferenciasTraduccion> guardar(PreferenciasTraduccion preferencias) async {
+    final error = errorGuardar;
+    if (error != null) throw error;
+    guardadas.add(preferencias);
+    return servidor = preferencias;
+  }
+
+  @override
+  Future<PreferenciasTraduccion> restablecer() async {
+    restablecidas++;
+    return servidor = const PreferenciasTraduccion(idContexto: 3, idTono: 1);
+  }
 }

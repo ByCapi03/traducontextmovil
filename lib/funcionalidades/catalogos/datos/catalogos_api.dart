@@ -2,6 +2,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:traducontextmovil/funcionalidades/autenticacion/presentacion/proveedores/estado_sesion.dart';
 import 'package:traducontextmovil/funcionalidades/catalogos/dominio/idioma.dart';
+import 'package:traducontextmovil/funcionalidades/preferencias/dominio/preferencias.dart';
 import 'package:traducontextmovil/nucleo/red/cliente_http.dart';
 import 'package:traducontextmovil/nucleo/red/peticiones_api.dart';
 
@@ -30,6 +31,24 @@ class CatalogosApi {
 
   /// GET /contextos: contextos de dominio activos (generales y del usuario).
   Future<List<OpcionCatalogo>> contextos() => _opciones('/contextos', 'id_contexto');
+
+  /// GET /tonos: tonos activos.
+  Future<List<OpcionCatalogo>> tonos() => _opciones('/tonos', 'id_tono');
+
+  /// GET /variantes-regionales: variantes activas de todos los idiomas.
+  Future<List<VarianteRegional>> variantesRegionales() async {
+    final resultado = await resultadoDe(_dio.get<dynamic>('/variantes-regionales'));
+    return [
+      for (final json in listaDeMapas(resultado))
+        if (json['activo'] as bool? ?? true)
+          VarianteRegional(
+            id: json['id_variante_regional'] as int,
+            nombre: json['nombre'] as String,
+            codigo: json['codigo'] as String,
+            idIdioma: json['id_idioma'] as int,
+          ),
+    ];
+  }
 
   Future<List<OpcionCatalogo>> _opciones(String ruta, String campoId) async {
     final resultado = await resultadoDe(_dio.get<dynamic>(ruta));
@@ -62,4 +81,12 @@ final contextosProvider = FutureProvider<List<OpcionCatalogo>>((ref) {
 /// Se pide una vez por sesión de la app; `ref.invalidate` para reintentar.
 final idiomasProvider = FutureProvider<List<Idioma>>(
   (ref) => ref.watch(catalogosApiProvider).idiomas(),
+);
+
+final tonosProvider = FutureProvider<List<OpcionCatalogo>>(
+  (ref) => ref.watch(catalogosApiProvider).tonos(),
+);
+
+final variantesRegionalesProvider = FutureProvider<List<VarianteRegional>>(
+  (ref) => ref.watch(catalogosApiProvider).variantesRegionales(),
 );
