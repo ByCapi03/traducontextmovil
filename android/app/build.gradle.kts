@@ -8,7 +8,10 @@ plugins {
 // Push (M3): google-services.json no se versiona. Solo se aplica el plugin si el
 // archivo existe y contiene un cliente para este applicationId; si no, la app
 // compila y arranca sin notificaciones push (ver docs/pendientes_movil.md).
-val idAplicacion = "com.traducontext.traducontextmovil"
+// Reutiliza el registro Android ya existente en Firebase (proyecto atemporal-f0125, alias
+// "atemporal"): el applicationId debe coincidir con su package_name. El namespace (paquete del
+// codigo Kotlin) no cambia.
+val idAplicacion = "com.atemporal"
 val archivoGoogleServices = file("google-services.json")
 if (archivoGoogleServices.exists() &&
     archivoGoogleServices.readText().contains("\"package_name\": \"$idAplicacion\"")

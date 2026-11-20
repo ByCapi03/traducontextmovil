@@ -23,11 +23,9 @@ Cada módulo no portado tiene una pantalla `PantallaPendiente` / `PantallaPendie
   sesión y cuando FCM lo renueva; `DELETE /dispositivos/{token}` antes de cerrar sesión; permiso
   de notificaciones (Android 13+); notificación local en primer plano; navegación al tocar
   (primer plano, segundo plano y app cerrada).
-- **Configuración pendiente (no es del backend):** el `android/app/google-services.json` actual
-  pertenece al paquete `com.atemporal`, no a `com.traducontext.traducontextmovil`. Con él, Gradle
-  omite el plugin de Google Services (aviso en la compilación) y la app arranca sin push.
-  Para activarlo: registrar la app Android `com.traducontext.traducontextmovil` en el proyecto
-  Firebase y reemplazar `google-services.json` (no se versiona). No hace falta
+- Configuración: el `applicationId` es `com.atemporal` para reutilizar el registro Android del
+  proyecto Firebase `atemporal-f0125`; su `android/app/google-services.json` (no se versiona) activa
+  el plugin de Google Services. Sin ese archivo la app arranca sin push. No hace falta
   `firebase_options.dart`: en Android se usa la configuración nativa.
 - iOS no está configurado (sin `GoogleService-Info.plist` ni APNs).
 - Se usa `getToken`/`onTokenRefresh` (obsoletos en firebase_messaging 17) porque el backend envía
@@ -64,5 +62,5 @@ Cada módulo no portado tiene una pantalla `PantallaPendiente` / `PantallaPendie
 | B3 Glosarios | Hecho | Ver la tabla de arriba. |
 | B4 Búsqueda de usuarios | Hecho | El backend busca solo por nombre (pendientes_backend.md #16). |
 | B5 Nombres de idioma | Hecho | `compartido/nombres_idioma.dart` por código. En Reportes el backend envía solo el nombre (sin código) y se muestra tal cual (pendientes_backend.md #18). |
-| B6 Notificaciones | Hecho | Canal `traducontext_mensajes`, agrupación por chat estilo mensajería, sin aviso del chat en pantalla. Contrato: `docs/contrato_notificaciones.md`. El push sigue desactivado mientras `google-services.json` no corresponda al `applicationId`. |
+| B6 Notificaciones | Hecho | Canal `traducontext_mensajes`, agrupación por chat estilo mensajería, sin aviso del chat en pantalla. Contrato: `docs/contrato_notificaciones.md`. |
 | B7 Integraciones y foto | Foto hecha; integraciones «Próximamente» | OAuth externo. |

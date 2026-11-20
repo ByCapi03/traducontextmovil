@@ -1,0 +1,27 @@
+{
+  // Antes de "Movil por USB": adb reverse tcp:8000 tcp:8000 (o usa scripts/movil_usb.ps1).
+  // "Movil por Wi-Fi": backend con --host 0.0.0.0 y la IP del PC en config/api_wifi.json.
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Movil por USB (adb reverse)",
+      "request": "launch",
+      "type": "dart",
+      "program": "lib/main.dart",
+      "args": ["--dart-define-from-file=config/api_usb.json"]
+    },
+    {
+      "name": "Movil por Wi-Fi (IP del PC)",
+      "request": "launch",
+      "type": "dart",
+      "program": "lib/main.dart",
+      "args": ["--dart-define-from-file=config/api_wifi.json"]
+    },
+    {
+      "name": "Emulador (10.0.2.2)",
+      "request": "launch",
+      "type": "dart",
+      "program": "lib/main.dart"
+    }
+  ]
+}
