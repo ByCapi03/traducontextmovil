@@ -23,6 +23,8 @@ abstract final class Rutas {
   // Pantallas completas del usuario (se abren con push desde las pestañas)
   static const String documentos = '/documentos';
   static const String glosarios = '/glosarios';
+  static const String glosarioPatron = '/glosarios/:idGlosario';
+  static String glosario(int idGlosario) => '/glosarios/$idGlosario';
   static const String preferencias = '/preferencias';
   static const String integraciones = '/integraciones';
 

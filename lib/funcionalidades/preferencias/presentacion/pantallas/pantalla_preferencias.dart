@@ -5,6 +5,8 @@ import 'package:traducontextmovil/compartido/widgets/mensaje_formulario.dart';
 import 'package:traducontextmovil/compartido/widgets/vista_estado.dart';
 import 'package:traducontextmovil/funcionalidades/catalogos/datos/catalogos_api.dart';
 import 'package:traducontextmovil/funcionalidades/catalogos/dominio/idioma.dart';
+import 'package:traducontextmovil/funcionalidades/glosarios/datos/glosarios_repositorio_remoto.dart';
+import 'package:traducontextmovil/funcionalidades/glosarios/dominio/glosarios.dart';
 import 'package:traducontextmovil/funcionalidades/preferencias/dominio/preferencias.dart';
 import 'package:traducontextmovil/funcionalidades/preferencias/presentacion/proveedores/controlador_preferencias.dart';
 import 'package:traducontextmovil/nucleo/tema/dimensiones.dart';
@@ -63,6 +65,7 @@ class PantallaPreferencias extends ConsumerWidget {
       tonos: tonos.requireValue,
       // Las variantes son opcionales: sin ellas el selector queda vacío.
       variantes: ref.watch(variantesRegionalesProvider).valueOrNull ?? const [],
+      glosarios: ref.watch(glosariosProvider).valueOrNull ?? const [],
     );
   }
 }
@@ -75,6 +78,7 @@ class FormularioPreferencias extends ConsumerWidget {
     required this.contextos,
     required this.tonos,
     required this.variantes,
+    required this.glosarios,
   });
 
   final EstadoPreferencias estado;
@@ -82,6 +86,13 @@ class FormularioPreferencias extends ConsumerWidget {
   final List<OpcionCatalogo> contextos;
   final List<OpcionCatalogo> tonos;
   final List<VarianteRegional> variantes;
+  final List<Glosario> glosarios;
+
+  /// Solo los glosarios cuyo idioma de destino es el preferido.
+  List<Glosario> _glosariosDe(String? codigo) => [
+        for (final g in glosarios)
+          if (g.aplicaA(destino: codigo)) g,
+      ];
 
   /// La variante regional debe corresponder al idioma de destino.
   List<VarianteRegional> _variantesDe(String? codigo) {
@@ -118,7 +129,7 @@ class FormularioPreferencias extends ConsumerWidget {
               alCambiar: (codigo) => controlador.cambiarIdioma(
                 codigo,
                 variantesValidas: {for (final v in _variantesDe(codigo)) v.id},
-                glosariosValidos: const {},
+                glosariosValidos: {for (final g in _glosariosDe(codigo)) g.id},
               ),
             ),
             if (f.codigoIdiomaDestino != null)
@@ -161,6 +172,24 @@ class FormularioPreferencias extends ConsumerWidget {
               opciones: [for (final t in tonos) (t.id, t.nombre)],
               alCambiar: (id) => controlador.editar(f.copiarCon(idTono: () => id)),
             ),
+            const SizedBox(height: Espaciados.md),
+            Desplegable<int>(
+              etiqueta: 'Glosario predeterminado',
+              valor: f.idGlosario,
+              textoVacio: 'Sin glosario',
+              habilitado: habilitado,
+              opciones: [for (final g in _glosariosDe(f.codigoIdiomaDestino)) (g.id, '${g.nombre} (${g.parIdiomas})')],
+              ayuda: 'Solo se aplica cuando el idioma de origen de la traducción coincide con el del glosario.',
+              alCambiar: (id) => controlador.editar(f.copiarCon(idGlosario: () => id)),
+            ),
+            if (f.idGlosario != null)
+              Align(
+                alignment: Alignment.centerRight,
+                child: TextButton(
+                  onPressed: habilitado ? () => controlador.editar(f.copiarCon(idGlosario: () => null)) : null,
+                  child: const Text('Quitar glosario'),
+                ),
+              ),
             const SizedBox(height: Espaciados.sm),
             SwitchListTile(
               contentPadding: EdgeInsets.zero,

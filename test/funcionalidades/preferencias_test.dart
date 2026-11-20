@@ -36,7 +36,10 @@ void main() {
     expect(find.text('Neutral'), findsOneWidget);
     expect(find.text('Elige primero un idioma de destino.'), findsOneWidget);
     // Sin cambios no se puede guardar.
+    await tester.scrollUntilVisible(find.text('Guardar preferencias'), 200, scrollable: find.byType(Scrollable).last);
     expect(tester.widget<FilledButton>(find.byType(FilledButton)).onPressed, isNull);
+    await tester.drag(find.byType(ListView), const Offset(0, 2000));
+    await tester.pumpAndSettle();
 
     await _elegir(tester, 'Idioma de destino', 'Inglés');
     expect(find.text('Solo se muestran las del idioma de destino.'), findsOneWidget);

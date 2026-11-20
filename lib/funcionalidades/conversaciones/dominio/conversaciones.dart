@@ -106,6 +106,7 @@ class NuevaConversacion {
     required this.idEntorno,
     this.idContexto,
     this.descripcionContexto,
+    this.idGlosario,
     this.mantenerContexto = true,
   });
 
@@ -114,6 +115,9 @@ class NuevaConversacion {
   final int idEntorno;
   final int? idContexto;
   final String? descripcionContexto;
+
+  /// Glosario del par de idiomas, en cualquier sentido (HU-32).
+  final int? idGlosario;
   final bool mantenerContexto;
 }
 

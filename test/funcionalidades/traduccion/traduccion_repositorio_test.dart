@@ -28,6 +28,7 @@ class _ApiFalsa implements TraduccionApi {
     required String texto,
     required String idiomaDestino,
     String? idiomaOrigen,
+    int? idGlosario,
   }) =>
       throw UnimplementedError();
 }

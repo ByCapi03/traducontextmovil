@@ -24,6 +24,7 @@ class TraduccionApi {
     required String texto,
     required String idiomaDestino,
     String? idiomaOrigen,
+    int? idGlosario,
   }) async {
     final json = await resultadoDe(
       _dio.post<dynamic>(
@@ -32,6 +33,7 @@ class TraduccionApi {
           'texto_origen': texto,
           'idioma_destino': idiomaDestino,
           'idioma_origen': ?idiomaOrigen,
+          'id_glosario': ?idGlosario,
         },
       ),
     ) as Map<String, dynamic>;

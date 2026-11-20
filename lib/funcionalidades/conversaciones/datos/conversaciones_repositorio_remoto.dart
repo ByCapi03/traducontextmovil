@@ -29,6 +29,7 @@ class ConversacionesRepositorioRemoto implements ConversacionesRepositorio {
             'id_entorno': datos.idEntorno,
             'id_contexto': ?datos.idContexto,
             'descripcion_contexto': ?datos.descripcionContexto,
+            'id_glosario': ?datos.idGlosario,
             'mantener_contexto': datos.mantenerContexto,
           },
         ),

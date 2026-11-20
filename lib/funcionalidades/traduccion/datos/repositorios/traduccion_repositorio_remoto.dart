@@ -26,8 +26,14 @@ class TraduccionRepositorioRemoto implements TraduccionRepositorio {
     required String texto,
     required String idiomaDestino,
     String? idiomaOrigen,
+    int? idGlosario,
   }) =>
-      _api.traducir(texto: texto.trim(), idiomaDestino: idiomaDestino, idiomaOrigen: idiomaOrigen);
+      _api.traducir(
+        texto: texto.trim(),
+        idiomaDestino: idiomaDestino,
+        idiomaOrigen: idiomaOrigen,
+        idGlosario: idGlosario,
+      );
 }
 
 final traduccionRepositorioProvider = Provider<TraduccionRepositorio>(

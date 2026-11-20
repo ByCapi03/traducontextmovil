@@ -6,6 +6,7 @@ import 'package:traducontextmovil/funcionalidades/catalogos/dominio/idioma.dart'
 import 'package:traducontextmovil/funcionalidades/chats/datos/chats_repositorio_remoto.dart';
 import 'package:traducontextmovil/funcionalidades/conversaciones/datos/conversaciones_repositorio_remoto.dart';
 import 'package:traducontextmovil/funcionalidades/documentos/datos/documentos_repositorio_remoto.dart';
+import 'package:traducontextmovil/funcionalidades/glosarios/datos/glosarios_repositorio_remoto.dart';
 import 'package:traducontextmovil/funcionalidades/historial/datos/historial_repositorio_remoto.dart';
 import 'package:traducontextmovil/funcionalidades/historial/dominio/historial.dart';
 import 'package:traducontextmovil/funcionalidades/notificaciones/datos/notificaciones_repositorio_remoto.dart';
@@ -24,10 +25,12 @@ import 'package:traducontextmovil/nucleo/red/excepcion_api.dart';
 import 'package:traducontextmovil/nucleo/voz/reconocimiento_voz.dart';
 import 'package:traducontextmovil/nucleo/voz/sintesis_voz.dart';
 
+import 'falsos_glosarios.dart';
 import 'falsos_m5.dart';
 import 'falsos_voz.dart';
 import 'repositorio_falso.dart';
 
+export 'falsos_glosarios.dart';
 export 'falsos_m5.dart';
 export 'falsos_voz.dart';
 
@@ -62,6 +65,7 @@ class Falsos {
   final ReconocimientoFalso reconocimiento = ReconocimientoFalso();
   final SintesisFalsa sintesis = SintesisFalsa();
   final PreferenciasFalsas preferencias = PreferenciasFalsas();
+  final GlosariosFalsos glosarios = GlosariosFalsos();
   final PreferenciasTraduccionFalsas preferenciasTraduccion = PreferenciasTraduccionFalsas();
   MensajeriaPush? mensajeria;
   List<Idioma> idiomas = idiomasPrueba;
@@ -97,6 +101,7 @@ class Falsos {
           ],
         ),
         preferenciasRepositorioProvider.overrideWithValue(preferenciasTraduccion),
+        glosariosRepositorioProvider.overrideWithValue(glosarios),
         documentosRepositorioProvider.overrideWithValue(documentos),
         chatsRepositorioProvider.overrideWithValue(chats),
         conversacionesRepositorioProvider.overrideWithValue(conversaciones),
@@ -113,7 +118,7 @@ class Falsos {
 
 class TraduccionFalsa implements TraduccionRepositorio {
   int configuracionesPedidas = 0;
-  final List<Map<String, String?>> traducciones = [];
+  final List<Map<String, Object?>> traducciones = [];
   ExcepcionApi? errorTraducir;
 
   @override
@@ -127,8 +132,9 @@ class TraduccionFalsa implements TraduccionRepositorio {
     required String texto,
     required String idiomaDestino,
     String? idiomaOrigen,
+    int? idGlosario,
   }) async {
-    traducciones.add({'texto': texto, 'origen': idiomaOrigen, 'destino': idiomaDestino});
+    traducciones.add({'texto': texto, 'origen': idiomaOrigen, 'destino': idiomaDestino, 'glosario': ?idGlosario});
     final error = errorTraducir;
     if (error != null) throw error;
     return ResultadoTraduccion(

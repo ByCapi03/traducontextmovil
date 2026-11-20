@@ -18,6 +18,8 @@ import 'package:traducontextmovil/funcionalidades/conversaciones/presentacion/pa
 import 'package:traducontextmovil/funcionalidades/conversaciones/presentacion/pantallas/pantalla_conversaciones.dart';
 import 'package:traducontextmovil/funcionalidades/conversaciones/presentacion/pantallas/pantalla_nueva_conversacion.dart';
 import 'package:traducontextmovil/funcionalidades/documentos/presentacion/pantallas/pantalla_documentos.dart';
+import 'package:traducontextmovil/funcionalidades/glosarios/presentacion/pantallas/pantalla_glosario.dart';
+import 'package:traducontextmovil/funcionalidades/glosarios/presentacion/pantallas/pantalla_glosarios.dart';
 import 'package:traducontextmovil/funcionalidades/historial/presentacion/pantallas/pantalla_historial.dart';
 import 'package:traducontextmovil/funcionalidades/inicio/presentacion/pantallas/pantalla_inicio.dart';
 import 'package:traducontextmovil/funcionalidades/perfil/presentacion/pantallas/pantalla_perfil.dart';
@@ -96,9 +98,11 @@ final enrutadorProvider = Provider<GoRouter>((ref) {
       ),
       // Pantallas completas del usuario (modulos de la web aun no portados).
       pestana(Rutas.documentos, const PantallaDocumentos()),
-      pestana(
-        Rutas.glosarios,
-        const PantallaPendiente(titulo: 'Glosarios', icono: Icons.menu_book_outlined),
+      pestana(Rutas.glosarios, const PantallaGlosarios()),
+      GoRoute(
+        path: Rutas.glosarioPatron,
+        builder: (context, estado) =>
+            PantallaGlosario(idGlosario: int.parse(estado.pathParameters['idGlosario']!)),
       ),
       pestana(Rutas.preferencias, const PantallaPreferencias()),
       pestana(

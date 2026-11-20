@@ -10,13 +10,16 @@ import 'package:traducontextmovil/funcionalidades/catalogos/datos/catalogos_api.
 import 'package:traducontextmovil/funcionalidades/catalogos/dominio/idioma.dart';
 import 'package:traducontextmovil/funcionalidades/conversaciones/datos/conversaciones_repositorio_remoto.dart';
 import 'package:traducontextmovil/funcionalidades/conversaciones/dominio/conversaciones.dart';
+import 'package:traducontextmovil/funcionalidades/glosarios/datos/glosarios_repositorio_remoto.dart';
+import 'package:traducontextmovil/funcionalidades/glosarios/dominio/glosarios.dart';
 import 'package:traducontextmovil/funcionalidades/traduccion/presentacion/widgets/selector_idioma.dart';
 import 'package:traducontextmovil/navegacion/rutas.dart';
 import 'package:traducontextmovil/nucleo/red/excepcion_api.dart';
 import 'package:traducontextmovil/nucleo/tema/dimensiones.dart';
 
 /// Configura una conversación con intérprete: idiomas de los dos
-/// participantes, entorno (obligatorio), contexto y descripción (opcionales).
+/// participantes, entorno (obligatorio), contexto, glosario y descripción
+/// (opcionales).
 class PantallaNuevaConversacion extends ConsumerStatefulWidget {
   const PantallaNuevaConversacion({super.key});
 
@@ -32,6 +35,7 @@ class _PantallaNuevaConversacionState extends ConsumerState<PantallaNuevaConvers
   String? _destino = 'en';
   int? _idEntorno;
   int? _idContexto;
+  int? _idGlosario;
   bool _mantenerContexto = true;
   bool _cargando = false;
   String? _error;
@@ -41,6 +45,13 @@ class _PantallaNuevaConversacionState extends ConsumerState<PantallaNuevaConvers
     _descripcion.dispose();
     super.dispose();
   }
+
+  /// Como en la web: glosarios del par de idiomas en cualquier sentido; cada
+  /// uno se aplica a las intervenciones de su sentido.
+  List<Glosario> _glosariosDelPar(List<Glosario> glosarios) => [
+        for (final g in glosarios)
+          if (g.aplicaA(origen: _origen, destino: _destino) || g.aplicaA(origen: _destino, destino: _origen)) g,
+      ];
 
   Future<void> _iniciar(List<Idioma> idiomas) async {
     final origen = idiomas.porCodigo(_origen);
@@ -71,6 +82,10 @@ class _PantallaNuevaConversacionState extends ConsumerState<PantallaNuevaConvers
               idEntorno: idEntorno,
               idContexto: _idContexto,
               descripcionContexto: descripcion.isEmpty ? null : descripcion,
+              idGlosario: _glosariosDelPar(ref.read(glosariosProvider).valueOrNull ?? const [])
+                      .any((g) => g.id == _idGlosario)
+                  ? _idGlosario
+                  : null,
               mantenerContexto: _mantenerContexto,
             ),
           );
@@ -94,6 +109,7 @@ class _PantallaNuevaConversacionState extends ConsumerState<PantallaNuevaConvers
     final idiomas = ref.watch(idiomasProvider);
     final entornos = ref.watch(entornosProvider);
     final contextos = ref.watch(contextosProvider);
+    final glosarios = _glosariosDelPar(ref.watch(glosariosProvider).valueOrNull ?? const []);
     return Scaffold(
       appBar: AppBar(title: const Text('Nueva conversación')),
       body: switch ((idiomas, entornos)) {
@@ -145,6 +161,19 @@ class _PantallaNuevaConversacionState extends ConsumerState<PantallaNuevaConvers
                   habilitado: !_cargando,
                   alCambiar: (id) => setState(() => _idContexto = id),
                 ),
+                if (glosarios.isNotEmpty) ...[
+                  const SizedBox(height: Espaciados.md),
+                  _Desplegable(
+                    etiqueta: 'Glosario (opcional)',
+                    valor: _idGlosario,
+                    opciones: [
+                      (null, 'Sin glosario'),
+                      for (final g in glosarios) (g.id, '${g.nombre} (${g.parIdiomas})'),
+                    ],
+                    habilitado: !_cargando,
+                    alCambiar: (id) => setState(() => _idGlosario = id),
+                  ),
+                ],
                 const SizedBox(height: Espaciados.md),
                 TextField(
                   controller: _descripcion,

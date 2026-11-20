@@ -8,6 +8,9 @@ import 'package:traducontextmovil/compartido/widgets/mensaje_formulario.dart';
 import 'package:traducontextmovil/compartido/widgets/vista_estado.dart';
 import 'package:traducontextmovil/funcionalidades/catalogos/datos/catalogos_api.dart';
 import 'package:traducontextmovil/funcionalidades/catalogos/dominio/idioma.dart';
+import 'package:traducontextmovil/compartido/widgets/desplegable.dart';
+import 'package:traducontextmovil/funcionalidades/glosarios/datos/glosarios_repositorio_remoto.dart';
+import 'package:traducontextmovil/funcionalidades/glosarios/dominio/glosarios.dart';
 import 'package:traducontextmovil/funcionalidades/historial/datos/historial_repositorio_remoto.dart';
 import 'package:traducontextmovil/funcionalidades/traduccion/datos/repositorios/traduccion_repositorio_remoto.dart';
 import 'package:traducontextmovil/funcionalidades/traduccion/dominio/traduccion.dart';
@@ -34,6 +37,9 @@ class _PantallaTraducirState extends ConsumerState<PantallaTraducir> {
   String? _origen;
   String? _destino;
   ResultadoTraduccion? _resultado;
+
+  /// Glosario elegido para esta traducción (solo los del par de idiomas actual).
+  int? _idGlosario;
   bool _cargando = false;
   String? _error;
 
@@ -70,7 +76,12 @@ class _PantallaTraducirState extends ConsumerState<PantallaTraducir> {
     try {
       final resultado = await ref
           .read(traduccionRepositorioProvider)
-          .traducir(texto: texto, idiomaDestino: destino, idiomaOrigen: _origen);
+          .traducir(
+            texto: texto,
+            idiomaDestino: destino,
+            idiomaOrigen: _origen,
+            idGlosario: _glosarioValido(ref.read(glosariosProvider).valueOrNull ?? const []),
+          );
       if (resultado.idTraduccion != null) ref.read(versionHistorialProvider.notifier).state++;
       if (mounted) setState(() => _resultado = resultado);
     } on ExcepcionApi catch (error) {
@@ -110,6 +121,36 @@ class _PantallaTraducirState extends ConsumerState<PantallaTraducir> {
       }
       _error = null;
     });
+  }
+
+  /// Como en la web: un glosario por traducción, del destino elegido y, si
+  /// se conoce, del origen (elegido o detectado en la última traducción).
+  List<Glosario> _glosariosDisponibles(List<Glosario> glosarios) => [
+        for (final g in glosarios)
+          if (g.aplicaA(origen: _origen ?? _resultado?.idiomaOrigen, destino: _destino)) g,
+      ];
+
+  int? _glosarioValido(List<Glosario> glosarios) =>
+      _glosariosDisponibles(glosarios).any((g) => g.id == _idGlosario) ? _idGlosario : null;
+
+  /// Solo aparece si el usuario tiene glosarios para el par de idiomas.
+  List<Widget> _selectorGlosario() {
+    final disponibles = _glosariosDisponibles(ref.watch(glosariosProvider).valueOrNull ?? const []);
+    if (disponibles.isEmpty) return const [];
+    return [
+      const SizedBox(height: Espaciados.md),
+      Desplegable<int>(
+        etiqueta: 'Glosario',
+        valor: _glosarioValido(disponibles),
+        textoVacio: 'Sin glosario',
+        habilitado: !_cargando,
+        opciones: [
+          (0, 'Sin glosario'),
+          for (final g in disponibles) (g.id, '${g.nombre} (${g.parIdiomas})'),
+        ],
+        alCambiar: (id) => setState(() => _idGlosario = id == 0 ? null : id),
+      ),
+    ];
   }
 
   Future<void> _copiar(String texto) async {
@@ -184,6 +225,7 @@ class _PantallaTraducirState extends ConsumerState<PantallaTraducir> {
               ),
             ],
           ),
+          ..._selectorGlosario(),
           const SizedBox(height: Espaciados.md),
           TextField(
             controller: _texto,
