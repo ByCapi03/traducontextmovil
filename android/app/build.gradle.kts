@@ -5,12 +5,27 @@ plugins {
     id("dev.flutter.flutter-gradle-plugin")
 }
 
+// Push (M3): google-services.json no se versiona. Solo se aplica el plugin si el
+// archivo existe y contiene un cliente para este applicationId; si no, la app
+// compila y arranca sin notificaciones push (ver docs/pendientes_movil.md).
+val idAplicacion = "com.traducontext.traducontextmovil"
+val archivoGoogleServices = file("google-services.json")
+if (archivoGoogleServices.exists() &&
+    archivoGoogleServices.readText().contains("\"package_name\": \"$idAplicacion\"")
+) {
+    apply(plugin = "com.google.gms.google-services")
+} else {
+    logger.warn("google-services.json ausente o sin cliente para $idAplicacion: push desactivado.")
+}
+
 android {
     namespace = "com.traducontext.traducontextmovil"
     compileSdk = flutter.compileSdkVersion
     ndkVersion = flutter.ndkVersion
 
     compileOptions {
+        // Requerido por flutter_local_notifications.
+        isCoreLibraryDesugaringEnabled = true
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
     }
@@ -21,7 +36,7 @@ android {
 
     defaultConfig {
         // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
-        applicationId = "com.traducontext.traducontextmovil"
+        applicationId = idAplicacion
         // You can update the following values to match your application needs.
         // For more information, see: https://flutter.dev/to/review-gradle-config.
         minSdk = flutter.minSdkVersion
@@ -41,4 +56,8 @@ android {
 
 flutter {
     source = "../.."
+}
+
+dependencies {
+    coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.1.4")
 }
