@@ -32,8 +32,11 @@ class RepositorioFalso implements AutenticacionRepositorio {
     return usuario;
   }
 
+  /// Si no es null, la app arranca con esta sesión ya iniciada.
+  UsuarioActual? sesionGuardada;
+
   @override
-  Future<UsuarioActual?> restaurarSesion() async => null;
+  Future<UsuarioActual?> restaurarSesion() async => sesionGuardada;
 
   @override
   Future<void> cerrarSesion() => _registrar('cerrarSesion', {});

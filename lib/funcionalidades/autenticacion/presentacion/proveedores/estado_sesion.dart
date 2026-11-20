@@ -69,6 +69,12 @@ class ControladorSesion extends Notifier<EstadoSesion> {
     state = SesionAutenticada(usuario);
   }
 
+  /// Vuelve a pedir /usuarios/me (por ejemplo, tras editar el perfil).
+  Future<void> recargarUsuario() async {
+    final usuario = await _repositorio.restaurarSesion();
+    if (usuario != null && state is SesionAutenticada) state = SesionAutenticada(usuario);
+  }
+
   Future<void> cerrarSesion() async {
     await _repositorio.cerrarSesion();
     state = const SesionNoAutenticada();

@@ -12,3 +12,11 @@ Revisado contra `traducontextback/app/api/routes/{autenticacion,usuarios}.py` y
 | 5 | `POST /autenticacion/solicitar-recuperacion` | Respuesta neutra (bien), pero el **502** solo puede ocurrir si la cuenta existe y está activa. | Paso 1 muestra mensaje neutro; con 502, «No pudimos enviar el correo…». | Enviar el correo en segundo plano o responder 200 también ante fallo SMTP (y registrarlo en logs). |
 | 6 | `POST /usuarios/verificar-codigo` | **400** agrupa código inválido, expirado y cuenta ya activa. | Un único texto que cubre los tres casos. | Código de error estable por caso. |
 | 7 | Todos | Los `detail` llegan sin tildes («contrasena», «sesion»). | La app nunca los muestra en autenticación: usa textos propios por código HTTP. | Corregir textos del backend. |
+
+## Detectados en M2 (usuario)
+
+| # | Endpoint | Situación actual | Efecto en la app | Cambio sugerido |
+|---|----------|------------------|------------------|-----------------|
+| 8 | `notificar()` en `app/services/notificaciones.py` | Ningún flujo la llama: ni la traducción de documentos ni los chats generan notificaciones. | La bandeja de Inicio funciona pero, por ahora, siempre estará vacía (salvo datos sembrados). | Llamar a `notificar()` al terminar `POST /documentos/traducir` (`DOCUMENTO_LISTO` / `DOCUMENTO_ERROR`) y al recibir un mensaje de chat (`MENSAJE_CHAT`). |
+| 9 | `datos` de las notificaciones | No hay contrato de claves. | La app asume `id_traduccion_documento` (documentos) e `id_chat` (chats) para navegar al tocar. | Documentar y usar esas claves al llamar a `notificar()`. |
+| 10 | `GET /configuracion-traduccion` | Si no existe responde 404 y no hay endpoint "crear por defecto". | La app usa `DELETE /configuracion-traduccion` (restablecer), que crea la configuración por defecto si no existe. Solo se llama tras un 404. | Opcional: `POST /configuracion-traduccion/por-defecto` explícito, o que el GET la cree. |

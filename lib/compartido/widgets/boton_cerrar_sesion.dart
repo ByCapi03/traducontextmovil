@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-
 import 'package:traducontextmovil/funcionalidades/autenticacion/presentacion/proveedores/estado_sesion.dart';
 
+/// Cierra la sesión tras confirmar. [conTexto]: botón con etiqueta en lugar de icono.
 class BotonCerrarSesion extends ConsumerWidget {
-  const BotonCerrarSesion({super.key});
+  const BotonCerrarSesion({super.key, this.conTexto = false});
+
+  final bool conTexto;
 
   Future<void> _confirmar(BuildContext context, WidgetRef ref) async {
     final confirmado = await showDialog<bool>(
@@ -31,6 +33,13 @@ class BotonCerrarSesion extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    if (conTexto) {
+      return OutlinedButton.icon(
+        onPressed: () => _confirmar(context, ref),
+        icon: const Icon(Icons.logout),
+        label: const Text('Cerrar sesión'),
+      );
+    }
     return IconButton(
       tooltip: 'Cerrar sesión',
       icon: const Icon(Icons.logout),

@@ -18,6 +18,9 @@ abstract final class Espaciados {
 /// Anchos máximos de contenido para que los formularios no se estiren en tablet.
 abstract final class Anchos {
   static const double formulario = 420;
+
+  /// Listas y pantallas de contenido.
+  static const double contenido = 720;
 }
 
 abstract final class Sombras {
