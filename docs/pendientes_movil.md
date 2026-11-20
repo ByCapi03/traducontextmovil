@@ -8,14 +8,14 @@ Cada módulo no portado tiene una pantalla `PantallaPendiente` / `PantallaPendie
 | Inicio | `/inicio` | Hecho (M2) | Bandeja de notificaciones. |
 | Traducción | `/traducir` | Hecho (M2) | Configuración, detección, intercambio, copiar, alternativas. |
 | Historial | `/historial` | Hecho (M2) | Búsqueda, solo favoritos, favorito, eliminar, copiar. |
-| Perfil | `/perfil` | Hecho (M2) | Editar nombre. Foto de perfil pendiente. |
+| Perfil | `/perfil` | Hecho (M2, B7) | Editar nombre; foto de perfil (agregar, cambiar, quitar). |
 | Documentos | `/documentos` | Hecho (M5) | Subir .docx/.xlsx/.pdf, traducir (origen automático o elegido), descargar/compartir, eliminar. |
-| Conversaciones (intérprete) | `/conversaciones`, `/interprete/:id` | Hecho (M5), solo texto | Crear (idiomas, entorno, contexto, descripción), elegir quién habla, reintentar, pausar/reanudar/finalizar, copiar. |
-| Chats entre usuarios | `/conversaciones` (pestaña Chats), `/chats/:idChat` | Hecho (M5) | Lista, nuevo chat por nombre, original + traducido, idioma de lectura, leído, refresco periódico con la pantalla abierta. |
-| Glosarios | `/glosarios` | Pendiente | CRUD extenso de glosarios y términos; se usa desde la web. |
-| Preferencias de traducción | `/preferencias` | Pendiente | Contexto, tono, variante, glosario por defecto; se usa desde la web. |
-| Integraciones (Meet/Zoom) y sesiones externas | `/integraciones` | Pendiente | Requiere OAuth en navegador y captura de audio de reuniones. |
-| Foto de perfil | — | Pendiente | `PUT/DELETE /perfil/foto` existen; falta selector de imagen. |
+| Conversaciones (intérprete) | `/conversaciones`, `/interprete/:id` | Hecho (M5, B1) | Crear (idiomas, entorno, contexto, glosario, descripción), elegir quién habla, dictado por voz y lectura en voz alta, reintentar, pausar/reanudar/finalizar, copiar. |
+| Chats entre usuarios | `/conversaciones` (pestaña Chats), `/chats/:idChat` | Hecho (M5, B4) | Lista, nuevo chat por nombre (desde 3 letras, con espera), original + traducido, idioma de lectura, leído, refresco periódico con la pantalla abierta. |
+| Glosarios | `/glosarios`, `/glosarios/:id` | Hecho (B3) | Crear, editar y eliminar glosarios y términos; duplicados validados como la web; selector en Traducir, Nueva conversación y Preferencias. Falta «Duplicar glosario» de la web. |
+| Preferencias de traducción | `/preferencias` | Hecho (B2) | Idioma de destino, variante regional, contexto, tono, glosario predeterminado, explicar expresiones, alternativas; guardar, descartar y restablecer. Falta el aprendizaje de preferencias (HU-34). |
+| Integraciones (Meet/Zoom) y sesiones externas | `/integraciones` | «Próximamente» (B7) | `POST /integraciones/{plataforma}/autorizar` exige OAuth en el navegador (y las sesiones externas, captura de audio de reuniones). |
+| Foto de perfil | `/perfil` | Hecho (B7) | `GET/PUT/DELETE /perfil/foto`; JPG, PNG o WEBP de hasta 5 MB, elegida con el selector de archivos (sin cámara). |
 
 ## Notificaciones push (M3)
 
@@ -49,8 +49,20 @@ Cada módulo no portado tiene una pantalla `PantallaPendiente` / `PantallaPendie
 
 | Funcionalidad web | Motivo |
 |-------------------|--------|
-| Voz en el intérprete (dictado y lectura en voz alta) | No hay endpoint de audio; la web lo hace en el navegador. Ver pendientes_backend.md #14. |
+| Voz en el intérprete | Hecho en B1 con el reconocimiento y la síntesis del dispositivo (como la web). Depende del motor de voz instalado; sin él se avisa y se puede seguir escribiendo. |
 | Asistencia conversacional (`POST /conversaciones/{id}/asistencia`) | No portada en móvil. |
 | Renombrar participantes y editar la configuración de una conversación (`PATCH`) | No portado en móvil. |
-| Tono y glosario al crear la conversación | No portado en móvil (contexto y descripción sí). |
+| Tono al crear la conversación | No portado en móvil (contexto, glosario y descripción sí). |
 | Chats en tiempo real | Sin WebSocket en el backend; se usa refresco periódico. |
+
+## Bloques B1–B7
+
+| Bloque | Estado | Notas |
+|--------|--------|-------|
+| B1 Voz en el intérprete (HU-25, HU-28) | Hecho | `speech_to_text` en el idioma del participante (región por tabla, como la web), texto parcial, reinicio tras silencios; `flutter_tts` en el idioma de destino; modo Manual/Automática en `shared_preferences` con la clave de la web `traducontext.reproduccionVoz`. Permiso `RECORD_AUDIO`. No probado en un dispositivo real (no se ejecutó `flutter run`). |
+| B2 Preferencias | Hecho | Ver la tabla de arriba. |
+| B3 Glosarios | Hecho | Ver la tabla de arriba. |
+| B4 Búsqueda de usuarios | Hecho | El backend busca solo por nombre (pendientes_backend.md #16). |
+| B5 Nombres de idioma | Hecho | `compartido/nombres_idioma.dart` por código. En Reportes el backend envía solo el nombre (sin código) y se muestra tal cual (pendientes_backend.md #18). |
+| B6 Notificaciones | Hecho | Canal `traducontext_mensajes`, agrupación por chat estilo mensajería, sin aviso del chat en pantalla. Contrato: `docs/contrato_notificaciones.md`. El push sigue desactivado mientras `google-services.json` no corresponda al `applicationId`. |
+| B7 Integraciones y foto | Foto hecha; integraciones «Próximamente» | OAuth externo. |

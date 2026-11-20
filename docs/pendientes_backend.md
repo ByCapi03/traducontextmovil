@@ -11,14 +11,14 @@ Revisado contra `traducontextback/app/api/routes/{autenticacion,usuarios}.py` y
 | 4 | `POST /usuarios/reenviar-codigo` | **404** «No existe un usuario con ese correo.» revela si el correo está registrado. | Se muestra «No encontramos una cuenta con ese correo.» | Responder 200 neutro como en recuperación. |
 | 5 | `POST /autenticacion/solicitar-recuperacion` | Respuesta neutra (bien), pero el **502** solo puede ocurrir si la cuenta existe y está activa. | Paso 1 muestra mensaje neutro; con 502, «No pudimos enviar el correo…». | Enviar el correo en segundo plano o responder 200 también ante fallo SMTP (y registrarlo en logs). |
 | 6 | `POST /usuarios/verificar-codigo` | **400** agrupa código inválido, expirado y cuenta ya activa. | Un único texto que cubre los tres casos. | Código de error estable por caso. |
-| 7 | Todos | Los `detail` llegan sin tildes («contrasena», «sesion»). | La app nunca los muestra en autenticación: usa textos propios por código HTTP. | Corregir textos del backend. |
+| 7 | Todos | Los `detail` llegan sin tildes («contrasena», «sesion»); también los nombres de idioma («Ingles», «Japones»). | La app no muestra los `detail`: usa textos propios por código HTTP. Los nombres de idioma salen de una tabla propia por código (B5). | Corregir textos del backend. |
 
 ## Detectados en M2 (usuario)
 
 | # | Endpoint | Situación actual | Efecto en la app | Cambio sugerido |
 |---|----------|------------------|------------------|-----------------|
-| 8 | `notificar()` en `app/services/notificaciones.py` | Ningún flujo la llama: ni la traducción de documentos ni los chats generan notificaciones. | La bandeja de Inicio funciona pero, por ahora, siempre estará vacía (salvo datos sembrados). | Llamar a `notificar()` al terminar `POST /documentos/traducir` (`DOCUMENTO_LISTO` / `DOCUMENTO_ERROR`) y al recibir un mensaje de chat (`MENSAJE_CHAT`). |
-| 9 | `datos` de las notificaciones | No hay contrato de claves. | La app asume `id_traduccion_documento` (documentos) e `id_chat` (chats) para navegar al tocar. | Documentar y usar esas claves al llamar a `notificar()`. |
+| 8 | `notificar()` en `app/services/notificaciones.py` | **Resuelto**: `notificar_mensaje_chat` (chats.py) y `notificar_documento_listo/_error` (routes/documentos.py) ya la llaman. | La bandeja y los push reciben avisos reales. | — |
+| 9 | `datos` de las notificaciones | **Resuelto** en el backend (`tipo`, `id_notificacion`, `id_chat`, `id_traduccion_documento`). | Contrato en `docs/contrato_notificaciones.md`. | — |
 | 10 | `GET /configuracion-traduccion` | Si no existe responde 404 y no hay endpoint "crear por defecto". | La app usa `DELETE /configuracion-traduccion` (restablecer), que crea la configuración por defecto si no existe. Solo se llama tras un 404. | Opcional: `POST /configuracion-traduccion/por-defecto` explícito, o que el GET la cree. |
 
 ## Detectados en M4 (administración)
@@ -33,6 +33,14 @@ Revisado contra `traducontextback/app/api/routes/{autenticacion,usuarios}.py` y
 | # | Endpoint | Situación actual | Efecto en la app | Cambio sugerido |
 |---|----------|------------------|------------------|-----------------|
 | 13 | WebSocket de chats (Etapa 2) | No existe ningún WebSocket en el backend. | El chat abierto consulta `GET /chats/{id}/mensajes?despues_de=` cada 4 s, solo con la pantalla abierta y la app en primer plano. | `WS /chats/ws?token=...` con eventos `mensaje_nuevo`, `mensaje_traducido` y `leido` por `id_chat`. |
-| 14 | Voz en la conversación con intérprete | No hay endpoint de audio para `/conversaciones` (solo `POST /sesiones-externas/{id}/audio`). La web usa el reconocimiento y la síntesis de voz del navegador. | La app móvil solo admite texto. | `POST /conversaciones/{id}/intervenciones/audio` (multipart, `id_participante`) que transcriba y traduzca. Alternativa sin backend: reconocimiento en el dispositivo (`speech_to_text`), igual que hace la web. |
+| 14 | Voz en la conversación con intérprete | No hay endpoint de audio para `/conversaciones`. | **Resuelto en el móvil (B1)** con reconocimiento y síntesis del dispositivo, como la web. | Opcional: `POST /conversaciones/{id}/intervenciones/audio` para dispositivos sin motor de voz. |
 | 15 | `POST /documentos/traducir` | Síncrono: la respuesta llega al terminar la traducción. | La app amplía el tiempo de espera a 10 min para esa petición; si la conexión se corta, el resultado se ve al recargar. | Procesar en segundo plano (estado `PENDIENTE`) y avisar con `notificar(DOCUMENTO_LISTO)`. |
 | 16 | `GET /chats/usuarios?q=` | Busca solo en `Usuario.nombre` (`ilike`, mínimo 2 caracteres) entre usuarios activos, excluye al propio usuario y devuelve solo `id_usuario` y `nombre`; **no busca por correo ni lo devuelve** (`app/services/chats.py` `buscar_usuarios`). | La app busca desde 3 caracteres con espera de 400 ms; la etiqueta dice «Buscar por nombre». Si llegara `correo` en la respuesta, la app ya lo muestra bajo el nombre. | Si se quiere buscar por correo: añadir `Usuario.correo.ilike(...)` (idealmente solo coincidencia exacta del correo completo, por privacidad) y devolver `correo` solo en ese caso. |
+
+## Detectados en B1–B7
+
+| # | Endpoint | Situación actual | Efecto en la app | Cambio sugerido |
+|---|----------|------------------|------------------|-----------------|
+| 17 | `push_fcm.enviar_a_tokens()` | Envía `AndroidConfig(priority="high")` sin `notification.channel_id` ni `tag`. | En segundo plano o con la app cerrada, Android usa el canal por defecto del manifiesto (`traducontext_mensajes`) y cada mensaje de chat crea una notificación nueva en vez de reemplazar la de su chat. | Enviar `channel_id="traducontext_mensajes"`, `tag="chat_{id_chat}"` en `MENSAJE_CHAT`, `default_sound` y `default_vibrate_timings` (ver `docs/contrato_notificaciones.md`). |
+| 18 | `GET /reportes/actividad` | Cada fila trae `idioma_origen`/`idioma_destino` como **nombre** (sin tildes) y sin código. | Reportes muestra esos nombres tal cual: no se pueden pasar a la tabla con tildes. | Añadir `codigo_idioma_origen` y `codigo_idioma_destino`. |
+| 19 | `GET /chats/usuarios` | Mínimo de 2 caracteres en el backend. | La app exige 3 (pedido en B4): con 2 no llama. | Opcional: alinear el mínimo a 3. |
