@@ -46,6 +46,10 @@ Future<Falsos> montarApp(
 
 /// Hace visible el widget (los formularios tienen scroll) y lo pulsa.
 Future<void> tocar(WidgetTester tester, Finder objetivo) async {
+  // Las listas perezosas no construyen lo que está fuera de pantalla.
+  if (objetivo.evaluate().isEmpty) {
+    await tester.scrollUntilVisible(objetivo, 200, scrollable: find.byType(Scrollable).first);
+  }
   await tester.ensureVisible(objetivo);
   await tester.pumpAndSettle();
   await tester.tap(objetivo);

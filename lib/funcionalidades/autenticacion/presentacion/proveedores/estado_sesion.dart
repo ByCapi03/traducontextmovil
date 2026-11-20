@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:traducontextmovil/funcionalidades/autenticacion/datos/repositorios/autenticacion_repositorio_remoto.dart';
 import 'package:traducontextmovil/funcionalidades/autenticacion/dominio/autenticacion_repositorio.dart';
 import 'package:traducontextmovil/funcionalidades/autenticacion/dominio/usuario_actual.dart';
+import 'package:traducontextmovil/funcionalidades/notificaciones/presentacion/proveedores/servicio_push.dart';
 import 'package:traducontextmovil/nucleo/red/excepcion_api.dart';
 import 'package:traducontextmovil/nucleo/red/notificador_sesion_expirada.dart';
 
@@ -76,6 +77,8 @@ class ControladorSesion extends Notifier<EstadoSesion> {
   }
 
   Future<void> cerrarSesion() async {
+    // El token push se elimina mientras la sesión aún es válida.
+    await ref.read(servicioPushProvider).antesDeCerrarSesion();
     await _repositorio.cerrarSesion();
     state = const SesionNoAutenticada();
   }
