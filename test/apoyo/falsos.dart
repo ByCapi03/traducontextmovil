@@ -39,6 +39,9 @@ class Falsos {
   final NotificacionesFalsas notificaciones = NotificacionesFalsas();
   List<Idioma> idiomas = idiomasPrueba;
 
+  /// Overrides de cada prueba (repositorios de administración, M5...).
+  final List<Override> adicionales = [];
+
   /// Arranca con la sesión de [usuario] ya iniciada.
   Falsos conSesion([UsuarioActual usuario = usuarioNormal]) {
     autenticacion.sesionGuardada = usuario;
@@ -51,6 +54,7 @@ class Falsos {
         historialRepositorioProvider.overrideWithValue(historial),
         notificacionesRepositorioProvider.overrideWithValue(notificaciones),
         idiomasProvider.overrideWith((ref) async => idiomas),
+        ...adicionales,
       ];
 }
 

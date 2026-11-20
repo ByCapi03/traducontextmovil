@@ -32,3 +32,15 @@ Cada módulo no portado tiene una pantalla `PantallaPendiente` / `PantallaPendie
 - iOS no está configurado (sin `GoogleService-Info.plist` ni APNs).
 - Se usa `getToken`/`onTokenRefresh` (obsoletos en firebase_messaging 17) porque el backend envía
   a tokens de registro (`MulticastMessage(tokens=...)`); `register()` devuelve un Installation ID.
+
+## Administración (M4)
+
+| Módulo web | Ruta móvil | Estado |
+|------------|-----------|--------|
+| Dashboard | `/administracion/dashboard` | Hecho: periodos, indicadores, idiomas/contextos más usados y actividad reciente (barras). |
+| Usuarios | `/administracion/usuarios` (+ `/:id`) | Hecho: búsqueda, filtro por estado, paginación, detalle, suspender/reactivar, cambiar rol. |
+| Reportes | `/administracion/reportes` | Hecho: periodo, tipo de servicio, totales, actividad paginada, exportar PDF/Excel (compartir). |
+| Perfil | `/administracion/perfil` | Hecho (editar nombre). |
+| Planes / Suscripciones | `/administracion/planes`, `/administracion/suscripciones` | "Próximamente": no existen en el backend. |
+| Filtros por idioma/contexto en reportes | — | Pendiente: la web los tiene; en móvil solo periodo y servicio. |
+| Gráficos de evolución | — | Se muestran como barras; sin librería de gráficos. |

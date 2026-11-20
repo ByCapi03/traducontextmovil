@@ -76,4 +76,5 @@ Finder campo(String etiqueta) => find.widgetWithText(TextFormField, etiqueta);
 Finder boton(String texto) => find.widgetWithText(FilledButton, texto);
 
 /// Selecciona una pestaña de la barra inferior por su icono.
-Future<void> irAPestana(WidgetTester tester, IconData icono) => tocar(tester, find.byIcon(icono));
+Future<void> irAPestana(WidgetTester tester, IconData icono) =>
+    tocar(tester, find.descendant(of: find.byType(NavigationBar), matching: find.byIcon(icono)));

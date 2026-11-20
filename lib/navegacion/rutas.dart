@@ -32,9 +32,19 @@ abstract final class Rutas {
   static String chat(int idChat) => '/chats/$idChat';
 
   // Carcasa de administracion
-  static const String administracionUsuarios = '/administracion/usuarios';
+  static const String prefijoAdministracion = '/administracion';
   static const String administracionDashboard = '/administracion/dashboard';
+  static const String administracionUsuarios = '/administracion/usuarios';
   static const String administracionReportes = '/administracion/reportes';
+  static const String administracionPerfil = '/administracion/perfil';
+
+  // Pantallas completas de administracion
+  static const String detalleUsuarioPatron = '/administracion/usuarios/:idUsuario';
+  static String detalleUsuario(int idUsuario) => '/administracion/usuarios/$idUsuario';
+
+  /// Planes y suscripciones aún no existen en el backend.
+  static const String administracionPlanes = '/administracion/planes';
+  static const String administracionSuscripciones = '/administracion/suscripciones';
 
   static const Set<String> pestanas = {
     inicio,
@@ -42,18 +52,28 @@ abstract final class Rutas {
     historial,
     conversaciones,
     perfil,
-    administracionUsuarios,
     administracionDashboard,
+    administracionUsuarios,
     administracionReportes,
+    administracionPerfil,
   };
 
-  /// Equivalente a `data: { permiso }` + permisoGuard en app.routes.ts.
-  /// El orden define la pantalla inicial de un administrador.
+  /// Equivalente a `data: { permiso }` + permisoGuard en app.routes.ts. Se
+  /// aplica a la ruta y a sus subrutas. El orden define la pantalla inicial
+  /// de un administrador.
   static const Map<String, String> permisoPorRuta = {
-    administracionUsuarios: Permisos.gestionarUsuarios,
     administracionDashboard: Permisos.verDashboard,
+    administracionUsuarios: Permisos.gestionarUsuarios,
     administracionReportes: Permisos.generarReportes,
   };
+
+  /// Permiso que exige [ubicacion] (o null si no exige ninguno).
+  static String? permisoPara(String ubicacion) {
+    for (final MapEntry(key: ruta, value: permiso) in permisoPorRuta.entries) {
+      if (ubicacion == ruta || ubicacion.startsWith('$ruta/')) return permiso;
+    }
+    return null;
+  }
 
   /// Pantalla de entrada segun permisos: admin -> primera ruta permitida; usuario -> inicio.
   static String inicialPara(UsuarioActual usuario) {

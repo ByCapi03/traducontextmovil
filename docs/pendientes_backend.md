@@ -20,3 +20,10 @@ Revisado contra `traducontextback/app/api/routes/{autenticacion,usuarios}.py` y
 | 8 | `notificar()` en `app/services/notificaciones.py` | Ningún flujo la llama: ni la traducción de documentos ni los chats generan notificaciones. | La bandeja de Inicio funciona pero, por ahora, siempre estará vacía (salvo datos sembrados). | Llamar a `notificar()` al terminar `POST /documentos/traducir` (`DOCUMENTO_LISTO` / `DOCUMENTO_ERROR`) y al recibir un mensaje de chat (`MENSAJE_CHAT`). |
 | 9 | `datos` de las notificaciones | No hay contrato de claves. | La app asume `id_traduccion_documento` (documentos) e `id_chat` (chats) para navegar al tocar. | Documentar y usar esas claves al llamar a `notificar()`. |
 | 10 | `GET /configuracion-traduccion` | Si no existe responde 404 y no hay endpoint "crear por defecto". | La app usa `DELETE /configuracion-traduccion` (restablecer), que crea la configuración por defecto si no existe. Solo se llama tras un 404. | Opcional: `POST /configuracion-traduccion/por-defecto` explícito, o que el GET la cree. |
+
+## Detectados en M4 (administración)
+
+| # | Endpoint | Situación actual | Efecto en la app | Cambio sugerido |
+|---|----------|------------------|------------------|-----------------|
+| 11 | Planes y suscripciones | No existen modelos ni endpoints. | Perfil del administrador muestra "Planes" y "Suscripciones" como "Próximamente". | `GET/POST /planes`, `PATCH/DELETE /planes/{id}`, `GET /suscripciones?estado=&pagina=`, `PATCH /suscripciones/{id}` (permiso `administrar_planes`, ya sembrado). |
+| 12 | `GET /dashboard`, `GET /reportes/actividad` | Exigen zona horaria IANA. | La app envía `UTC` (Dart no expone la zona IANA sin plugin): los cortes por día pueden desplazarse unas horas. | Opcional: aceptar un desplazamiento (`+-HH:MM`) además de la zona IANA. |

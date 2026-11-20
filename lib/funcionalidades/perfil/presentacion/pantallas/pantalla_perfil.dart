@@ -13,11 +13,12 @@ import 'package:traducontextmovil/nucleo/tema/colores.dart';
 import 'package:traducontextmovil/nucleo/tema/dimensiones.dart';
 
 /// Perfil del usuario y sección "Más" con el resto de módulos de la web.
-/// [mostrarMas] es false en la carcasa de administración.
+/// En la carcasa de administración ([esAdministracion]) muestra en su lugar
+/// planes y suscripciones (aún no existen en el backend).
 class PantallaPerfil extends ConsumerWidget {
-  const PantallaPerfil({super.key, this.mostrarMas = true});
+  const PantallaPerfil({super.key, this.esAdministracion = false});
 
-  final bool mostrarMas;
+  final bool esAdministracion;
 
   Future<void> _editarNombre(BuildContext context, WidgetRef ref, String actual) async {
     final nuevo = await showDialog<String>(
@@ -81,7 +82,29 @@ class PantallaPerfil extends ConsumerWidget {
               ),
             ),
           ),
-          if (mostrarMas) ...[
+          if (esAdministracion) ...[
+            const SizedBox(height: Espaciados.lg),
+            Text('Administración', style: textos.titleMedium),
+            const SizedBox(height: Espaciados.sm),
+            const Card(
+              child: Column(
+                children: [
+                  _Opcion(
+                    icono: Icons.workspace_premium_outlined,
+                    titulo: 'Planes',
+                    subtitulo: 'Próximamente',
+                    ruta: Rutas.administracionPlanes,
+                  ),
+                  _Opcion(
+                    icono: Icons.card_membership_outlined,
+                    titulo: 'Suscripciones',
+                    subtitulo: 'Próximamente',
+                    ruta: Rutas.administracionSuscripciones,
+                  ),
+                ],
+              ),
+            ),
+          ] else ...[
             const SizedBox(height: Espaciados.lg),
             Text('Más', style: textos.titleMedium),
             const SizedBox(height: Espaciados.sm),

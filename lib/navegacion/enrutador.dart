@@ -6,6 +6,7 @@ import 'package:traducontextmovil/compartido/widgets/pantalla_pendiente.dart';
 import 'package:traducontextmovil/compartido/widgets/pantalla_pendiente_contenido.dart';
 import 'package:traducontextmovil/funcionalidades/administracion/dashboard/presentacion/pantallas/pantalla_dashboard.dart';
 import 'package:traducontextmovil/funcionalidades/administracion/reportes/presentacion/pantallas/pantalla_reportes.dart';
+import 'package:traducontextmovil/funcionalidades/administracion/usuarios/presentacion/pantallas/pantalla_detalle_usuario.dart';
 import 'package:traducontextmovil/funcionalidades/administracion/usuarios/presentacion/pantallas/pantalla_usuarios.dart';
 import 'package:traducontextmovil/funcionalidades/autenticacion/presentacion/pantallas/pantalla_inicio_sesion.dart';
 import 'package:traducontextmovil/funcionalidades/autenticacion/presentacion/pantallas/pantalla_recuperar_contrasena.dart';
@@ -34,8 +35,12 @@ String? redirigirSegunSesion(EstadoSesion sesion, String ubicacion) {
       if (ubicacion == Rutas.cargando || Rutas.publicas.contains(ubicacion)) {
         return rutaInicial;
       }
-      final permisoRequerido = Rutas.permisoPorRuta[ubicacion];
+      final permisoRequerido = Rutas.permisoPara(ubicacion);
       if (permisoRequerido != null && !usuario.tienePermiso(permisoRequerido)) {
+        return rutaInicial;
+      }
+      // El resto de la carcasa de administracion (perfil, planes...) solo para administradores.
+      if (ubicacion.startsWith('${Rutas.prefijoAdministracion}/') && !usuario.esAdministrador) {
         return rutaInicial;
       }
       return null;
@@ -110,18 +115,47 @@ final enrutadorProvider = Provider<GoRouter>((ref) {
         Rutas.chatPatron,
         const PantallaPendiente(titulo: 'Chat', icono: Icons.chat_bubble_outline),
       ),
+      // Pantallas completas de administracion. Van antes de la carcasa para
+      // que /administracion/usuarios/:id no se resuelva dentro de la pestaña.
+      GoRoute(
+        path: Rutas.detalleUsuarioPatron,
+        builder: (context, estado) => PantallaDetalleUsuario(
+          idUsuario: int.parse(estado.pathParameters['idUsuario']!),
+        ),
+      ),
+      pestana(
+        Rutas.administracionPlanes,
+        const PantallaPendiente(
+          titulo: 'Planes',
+          icono: Icons.workspace_premium_outlined,
+          descripcion: 'Próximamente. Los planes aún no existen en el backend.',
+        ),
+      ),
+      pestana(
+        Rutas.administracionSuscripciones,
+        const PantallaPendiente(
+          titulo: 'Suscripciones',
+          icono: Icons.card_membership_outlined,
+          descripcion: 'Próximamente. Las suscripciones aún no existen en el backend.',
+        ),
+      ),
       // El orden de estas ramas lo usa CarcasaAdministracion (indiceRama).
       StatefulShellRoute.indexedStack(
         builder: (context, estado, navegacion) => CarcasaAdministracion(navegacion: navegacion),
         branches: [
           StatefulShellBranch(
-            routes: [pestana(Rutas.administracionUsuarios, const PantallaUsuarios())],
-          ),
-          StatefulShellBranch(
             routes: [pestana(Rutas.administracionDashboard, const PantallaDashboard())],
           ),
           StatefulShellBranch(
+            routes: [pestana(Rutas.administracionUsuarios, const PantallaUsuarios())],
+          ),
+          StatefulShellBranch(
             routes: [pestana(Rutas.administracionReportes, const PantallaReportes())],
+          ),
+          StatefulShellBranch(
+            routes: [
+              pestana(Rutas.administracionPerfil, const PantallaPerfil(esAdministracion: true)),
+            ],
           ),
         ],
       ),
