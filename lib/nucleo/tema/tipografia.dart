@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'colores.dart';
+import 'package:traducontextmovil/nucleo/tema/colores.dart';
 
 /// Tipografia copiada de traducontextfront/src/styles/_tipografia.css.
 /// 1rem = 16 px; line-height 1.5.

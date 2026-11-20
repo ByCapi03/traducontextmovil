@@ -1,8 +1,8 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:traducontextmovil/datos/modelos/usuario_actual.dart';
-import 'package:traducontextmovil/nucleo/rutas/enrutador.dart';
-import 'package:traducontextmovil/nucleo/rutas/rutas.dart';
-import 'package:traducontextmovil/presentacion/autenticacion/estado_sesion.dart';
+import 'package:traducontextmovil/funcionalidades/autenticacion/datos/modelos/usuario_actual.dart';
+import 'package:traducontextmovil/navegacion/enrutador.dart';
+import 'package:traducontextmovil/navegacion/rutas.dart';
+import 'package:traducontextmovil/funcionalidades/autenticacion/presentacion/proveedores/estado_sesion.dart';
 
 UsuarioActual _usuario(List<String> permisos) => UsuarioActual.desdeJson({
       'id': 1,

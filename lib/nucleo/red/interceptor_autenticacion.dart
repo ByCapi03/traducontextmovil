@@ -1,7 +1,7 @@
 import 'package:dio/dio.dart';
 
-import '../almacenamiento/almacenamiento_seguro.dart';
-import 'notificador_sesion_expirada.dart';
+import 'package:traducontextmovil/nucleo/almacenamiento/almacenamiento_seguro.dart';
+import 'package:traducontextmovil/nucleo/red/notificador_sesion_expirada.dart';
 
 /// Anade `Authorization: Bearer <token>` y, ante un 401, borra el token y
 /// avisa para volver a /login (equivalente al autenticacion.interceptor del web).

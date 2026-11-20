@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-import '../../nucleo/tema/colores.dart';
-import '../../nucleo/tema/dimensiones.dart';
+import 'package:traducontextmovil/nucleo/tema/colores.dart';
+import 'package:traducontextmovil/nucleo/tema/dimensiones.dart';
 
 /// Carcasa vacia para las pantallas que se implementan en hitos posteriores.
 class PantallaEnConstruccion extends StatelessWidget {

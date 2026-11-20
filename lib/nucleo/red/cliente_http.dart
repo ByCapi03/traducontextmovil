@@ -1,10 +1,10 @@
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../almacenamiento/almacenamiento_seguro.dart';
-import '../configuracion/configuracion_api.dart';
-import 'interceptor_autenticacion.dart';
-import 'notificador_sesion_expirada.dart';
+import 'package:traducontextmovil/nucleo/almacenamiento/almacenamiento_seguro.dart';
+import 'package:traducontextmovil/nucleo/configuracion/configuracion_api.dart';
+import 'package:traducontextmovil/nucleo/red/interceptor_autenticacion.dart';
+import 'package:traducontextmovil/nucleo/red/notificador_sesion_expirada.dart';
 
 final clienteHttpProvider = Provider<Dio>((ref) {
   final dio = Dio(

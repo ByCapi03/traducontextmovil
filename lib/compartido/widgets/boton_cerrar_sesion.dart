@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../presentacion/autenticacion/estado_sesion.dart';
+import 'package:traducontextmovil/funcionalidades/autenticacion/presentacion/proveedores/estado_sesion.dart';
 
 class BotonCerrarSesion extends ConsumerWidget {
   const BotonCerrarSesion({super.key});

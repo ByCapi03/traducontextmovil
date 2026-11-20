@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../nucleo/tema/colores.dart';
+import 'package:traducontextmovil/nucleo/tema/colores.dart';
 
 /// Se muestra mientras se valida el token guardado contra /usuarios/me.
 class PantallaCarga extends StatelessWidget {

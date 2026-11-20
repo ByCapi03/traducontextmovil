@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 
-import 'colores.dart';
-import 'dimensiones.dart';
-import 'tipografia.dart';
+import 'package:traducontextmovil/nucleo/tema/colores.dart';
+import 'package:traducontextmovil/nucleo/tema/dimensiones.dart';
+import 'package:traducontextmovil/nucleo/tema/tipografia.dart';
 
 abstract final class TemaAplicacion {
   static const ColorScheme _esquema = ColorScheme(
